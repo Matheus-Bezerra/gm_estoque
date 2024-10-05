@@ -27,14 +27,14 @@ export const Header = () => {
                         </Link>
                         <Link
                             to="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                            className="flex items-center gap-4 px-2.5 text-foreground"
                         >
                             <Home className="h-5 w-5" />
-                            Dashboard
+                            Início
                         </Link>
                         <Link
                             to="#"
-                            className="flex items-center gap-4 px-2.5 text-foreground"
+                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                         >
                             <PackageOpen className="h-5 w-5" />
                             Produtos
@@ -67,7 +67,7 @@ export const Header = () => {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link to="#">Dashboard</Link>
+                            <Link to="#">Início</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />

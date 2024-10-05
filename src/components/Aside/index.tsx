@@ -17,19 +17,19 @@ export const Aside = () => {
         <TooltipTrigger asChild>
           <Link
             to="#"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
           >
             <Home className="h-5 w-5" />
-            <span className="sr-only">Dashboard</span>
+            <span className="sr-only">Início</span>
           </Link>
         </TooltipTrigger>
-        <TooltipContent side="right">Dashboard</TooltipContent>
+        <TooltipContent side="right">Início</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
           <Link
             to="#"
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
           >
             <PackageOpen className="h-5 w-5" />
             <span className="sr-only">Produtos</span>
