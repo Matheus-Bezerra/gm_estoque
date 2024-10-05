@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,13 +7,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Bolt, CircleUserRound, LogOut } from "lucide-react"
+import { Bolt, LogOut, User2 } from "lucide-react"
 
 export const InfoUser = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <CircleUserRound className="cursor-pointer" />
+                <Button variant="outline" size="icon" >
+                    <User2  />
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Matheus Bezerra</DropdownMenuLabel>
