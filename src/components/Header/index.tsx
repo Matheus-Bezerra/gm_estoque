@@ -2,11 +2,12 @@ import { Boxes, Home, LineChart, PackageOpen, PanelLeft, Tag, Users2 } from "luc
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { ModeToggle } from "../theme/ModeToggle"
 import { InfoUser } from "./components/InfoUser"
-
 export const Header = () => {
+    const location = useLocation(); // Pega a localização atual
+
     return (
         <header className="sticky top-0 z-30 flex justify-between h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <Sheet>
@@ -26,36 +27,36 @@ export const Header = () => {
                             <span className="sr-only">GM Estoque</span>
                         </Link>
                         <Link
-                            to="#"
-                            className="flex items-center gap-4 px-2.5 text-foreground"
+                            to="/"
+                            className={`flex items-center gap-4 px-2.5 ${location.pathname === '/' ? 'text-primary-foreground' : 'text-foreground'}`}
                         >
                             <Home className="h-5 w-5" />
                             Início
                         </Link>
                         <Link
-                            to="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                            to="produtos"
+                            className={`flex items-center gap-4 px-2.5 ${location.pathname === '/produtos' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <PackageOpen className="h-5 w-5" />
                             Produtos
                         </Link>
                         <Link
-                            to="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                            to="fornecedores"
+                            className={`flex items-center gap-4 px-2.5 ${location.pathname === '/fornecedores' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <Users2 className="h-5 w-5" />
                             Fornecedores
                         </Link>
                         <Link
-                            to="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                            to="categorias"
+                            className={`flex items-center gap-4 px-2.5 ${location.pathname === '/categorias' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <Tag className="h-5 w-5" />
                             Categorias
                         </Link>
                         <Link
-                            to="#"
-                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                            to="analise"
+                            className={`flex items-center gap-4 px-2.5 ${location.pathname === '/analise' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <LineChart className="h-5 w-5" />
                             Análise
@@ -67,7 +68,7 @@ export const Header = () => {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link to="#">Início</Link>
+                            <Link to="/">Início</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
@@ -80,8 +81,6 @@ export const Header = () => {
                 <ModeToggle />
                 <InfoUser />
             </div>
-            
         </header>
-    )
-}
-
+    );
+};
