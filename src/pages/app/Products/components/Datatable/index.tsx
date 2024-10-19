@@ -76,7 +76,7 @@ export const columns: ColumnDef<Produto>[] = [
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("status")}</div>
+            <div className="capitalize"><span className={`inline-block w-2.5 h-2.5 rounded-full mr-2 ${row.getValue('status') == 'ativo' ? 'bg-green-400' : 'bg-red-400'}`}></span>{row.getValue("status")}</div>
         ),
     },
     {
@@ -197,7 +197,7 @@ export function DataTable() {
                     }
                     className="max-w-sm"
                 />
-                
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

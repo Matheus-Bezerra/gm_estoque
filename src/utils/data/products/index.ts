@@ -51,7 +51,7 @@ export const produtos: Produto[] = [
         nome: "Sobrecoxa",
         tipoControle: "quantidade",
         quantidade: 7,
-        status: "ativo",
+        status: "inativo",
         fornecedores: [
             { nome: "Fornecedor D", email: "fornecedorD@example.com", produtosAssociados: ["Sobrecoxa"] }
         ],
@@ -65,7 +65,7 @@ export const produtos: Produto[] = [
         nome: "Pacote de Petiscos",
         tipoControle: "quantidade",
         quantidade: 15,
-        status: "ativo",
+        status: "inativo",
         fornecedores: [
             { nome: "Fornecedor E", email: "fornecedorE@example.com", produtosAssociados: ["Pacote de Petiscos"] }
         ],
