@@ -35,6 +35,13 @@ import {
 import { Categorias, Fornecedor, Produto } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
 import { produtos } from "@/utils/data/products"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { MultiSelect } from "@/components/ui/multi-select"
+import { handlePesoInput } from "@/utils/validations/handlePesoInput"
+import { fornecedoresLista } from "@/utils/data/products/fornecedores"
+import { categoriasLista } from "@/utils/data/products/categorias"
+import { useToast } from "@/hooks/use-toast"
 
 export const columns: ColumnDef<Produto>[] = [
     {
@@ -128,32 +135,144 @@ export const columns: ColumnDef<Produto>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const produto = row.original
+            const produto = row.original;
+            const [openEdit, setOpenEdit] = React.useState(false);
+            const [openDelete, setOpenDelete] = React.useState(false);
+
+            const [addTipoControle, setAddTipoControle] = React.useState("quantidade")
+            const [addFornecedores, setAddFornecedores] = React.useState<string[]>([]);
+            const [addCategorias, setAddCategorias] = React.useState<string[]>([]);
+            const { toast } = useToast()
+
+            const editProduto = (e: React.FormEvent) => {
+                e.preventDefault()
+
+                toast({
+                    title: "Sucesso",
+                    description: "Produto Editado com sucesso!",
+                    duration: 5000,
+                    variant: "default"
+                })
+            }
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Abrir menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(produto.id)}
-                        >
-                            <SquarePen className="h-4 w-4 mr-2" /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-muted-foreground">
-                            <Trash2 className="h-4 w-4 mr-2 text-red-400" />  <span>Excluir</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Abrir menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={() => setOpenEdit(true)}
+                            >
+                                <SquarePen className="h-4 w-4 mr-2" /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setOpenDelete(true)}
+                                className="cursor-pointer text-red-400 hover:bg-muted-foreground"
+                            >
+                                <Trash2 className="h-4 w-4 mr-2 text-red-400" /> Excluir
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Modal de edição */}
+                    <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Editar Produto</DialogTitle>
+                                <DialogDescription>Altere os detalhes do produto abaixo</DialogDescription>
+                            </DialogHeader>
+
+                            <form className="grid gap-4" onSubmit={editProduto}>
+                                <Input id="product-name" placeholder="Nome" />
+                                <Select value={produto.status}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
+                                        <SelectItem value="inativo"> <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Select value={addTipoControle} onValueChange={setAddTipoControle}>
+                                    <SelectTrigger >
+                                        <SelectValue placeholder="Tipo de Controle" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
+                                        <SelectItem value="peso">Controle: Peso</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {produto.tipoControle === "peso" ? (
+                                    <Input
+                                        placeholder="Peso (Kg)"
+                                        className="capitalize"
+                                        inputMode="decimal" // Permite números decimais
+                                        onBeforeInput={handlePesoInput} // Bloqueia caracteres especiais
+                                    />
+                                ) : (
+                                    <Input
+                                        placeholder="Quantidade"
+                                        className="capitalize"
+                                        type="number" // Somente números
+                                    />
+                                )}
+
+                                <MultiSelect
+                                    options={fornecedoresLista}
+                                    onValueChange={setAddFornecedores}
+                                    defaultValue={addFornecedores}
+                                    placeholder="Fornecedores"
+                                    variant="inverted"
+                                    animation={2}
+                                    maxCount={3}
+                                />
+
+                                <MultiSelect
+                                    options={categoriasLista}
+                                    onValueChange={setAddCategorias}
+                                    defaultValue={addCategorias}
+                                    placeholder="Categorias"
+                                    variant="inverted"
+                                    animation={2}
+                                    maxCount={3}
+                                />
+                                <Button className="w-100" type="submit">Salvar</Button>
+                            </form>
+
+                            <DialogClose asChild>
+                                <Button variant="outline">Fechar</Button>
+                            </DialogClose>
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Modal de confirmação de exclusão */}
+                    <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Excluir Produto</DialogTitle>
+                                <DialogDescription>Confirmação de exclusão</DialogDescription>
+                            </DialogHeader>
+                            <p className="text-foreground">Tem certeza que deseja excluir o produto <span className="font-bold text-xl">"{produto.nome}"</span> ?</p>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setOpenDelete(false)}>Cancelar</Button>
+                                <Button>Excluir</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </>
+            );
         },
     },
+
 ]
 
 

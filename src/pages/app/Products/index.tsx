@@ -7,38 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MultiSelect } from "@/components/ui/multi-select";
 import { FormEvent, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { categoriasLista } from "@/utils/data/products/categorias";
+import { fornecedoresLista } from "@/utils/data/products/fornecedores";
+import { handlePesoInput } from "@/utils/validations/handlePesoInput";
 
-const fornecedoresLista = [
-    { value: "fornecedorA", label: "Fornecedor A" },
-    { value: "fornecedorB", label: "Fornecedor B" },
-    { value: "fornecedorC", label: "Fornecedor C" },
-    { value: "fornecedorD", label: "Fornecedor D" },
-    { value: "fornecedorE", label: "Fornecedor E" },
-];
-
-const categoriasLista = [
-    { value: "comida", label: "Fornecedor A" },
-    { value: "fastFood", label: "Fornecedor B" },
-    { value: "fritura", label: "Fornecedor C" },
-    { value: "mistura", label: "Fornecedor D" },
-    { value: "assado", label: "Fornecedor E" },
-    { value: "lanches", label: "Fornecedor E" },
-    { value: "pizza", label: "Fornecedor E" },
-];
 
 export const Products = () => {
     const [addTipoControle, setAddTipoControle] = useState("quantidade")
     const [addFornecedores, setAddFornecedores] = useState<string[]>([]);
     const [addCategorias, setAddCategorias] = useState<string[]>([]);
     const { toast } = useToast()
-
-    const handlePesoInput = (e: FormEvent) => {
-        // @ts-ignore
-        const value = e.target.value
-        if (!/^[0-9]*[.,]?[0-9]*$/.test(value)) {
-            e.preventDefault()
-        }
-    }
 
     const addProduto = (e: FormEvent) => {
         e.preventDefault()
