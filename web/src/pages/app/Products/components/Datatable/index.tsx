@@ -35,17 +35,14 @@ import {
 import { Categorias, Fornecedor, Produto } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
 import { produtos } from "@/utils/data/products"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MultiSelect } from "@/components/ui/multi-select"
-import { handlePesoInput } from "@/utils/validations/handlePesoInput"
 import { fornecedoresLista } from "@/utils/data/products/fornecedores"
 import { categoriasLista } from "@/utils/data/products/categorias"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {SubmitHandler } from "react-hook-form";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
+import { DialogDeleteProduto } from "@/pages/app/Products/components/Dialogs/DialogDeleteProduto"
+import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/DialogEditProduto"
 
 
 export const columns: ColumnDef<Produto>[] = [
@@ -145,42 +142,32 @@ export const columns: ColumnDef<Produto>[] = [
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
-            const { control, handleSubmit, setValue, formState: { errors } } = useForm({
-                resolver: zodResolver(formProdutoSchema),
-                defaultValues: {
-                    nome: produto.nome,
-                    status: produto.status,
-                    tipoControle: produto.tipoControle,
-                    peso: produto.peso,
-                    quantidade: produto.quantidade,
-                    fornecedores: produto.fornecedores.map(fr => fr.id) || [],
-                    categorias: produto.categorias.map(pr => pr.id) || []
-                },
-            });
-
-            const [tipoControle, setTipoControle] = React.useState<"quantidade" | "peso">(produto.tipoControle)
-
-            const editProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
-
+            const handleEditSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
                 console.log(data);
+
+                setOpenEdit(false);
+
                 toast({
                     title: "Sucesso",
                     description: "Produto Editado com sucesso!",
                     duration: 5000,
                     variant: "success"
                 });
-                setOpenEdit(false);
-            }
+            };
 
-            const handleTipoControleChange = (value: "quantidade" | "peso") => {
-                console.log(tipoControle)
-                setTipoControle(value)
+            const handleDeleteProduto = () => {
+                console.log("Produto deletado!", produto)
+                setOpenDelete(false); 
 
-                setValue("quantidade", undefined)
-                setValue("peso", undefined)
-            }
+                toast({
+                    title: "Sucesso",
+                    description: "Produto removido com sucesso!",
+                    duration: 5000,
+                    variant: "success"
+                });
+            };
 
-            
+
             return (
                 <>
                     <DropdownMenu>
@@ -208,156 +195,22 @@ export const columns: ColumnDef<Produto>[] = [
                     </DropdownMenu>
 
                     {/* Modal de edição */}
-                    <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Editar Produto</DialogTitle>
-                                <DialogDescription>Altere os detalhes do produto abaixo</DialogDescription>
-                            </DialogHeader>
-
-                            <form className="grid gap-4" onSubmit={handleSubmit(editProduto)}>
-                                <div>
-                                    <Controller
-                                        name="nome"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Input id="product-name" placeholder="Nome" {...field} />
-                                        )}
-                                    />
-                                    {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
-                                </div>
-                                <Controller
-                                    name="status"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
-                                                <SelectItem value="inativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
-                                <Controller
-                                    name="tipoControle"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select value={field.value} onValueChange={(value: "quantidade" | "peso") => {
-                                            field.onChange(value); 
-                                            handleTipoControleChange(value); 
-                                        }}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Tipo de Controle" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
-                                                <SelectItem value="peso">Controle: Peso</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
-                                {/* Renderização Condicional com Controller para Peso ou Quantidade */}
-                                <Controller
-                                    name={tipoControle === "peso" ? "peso" : "quantidade"}
-                                    control={control}
-                                    rules={{
-                                        required: tipoControle === "peso"
-                                            ? "Peso é obrigatório."
-                                            : "Quantidade é obrigatória."
-                                    }}
-                                    render={({ field, field: { value } }) => (
-                                        tipoControle === "peso" ? (
-                                            <div>
-                                                <Input
-                                                    {...field}
-                                                    placeholder="Peso (Kg)"
-                                                    className="capitalize"
-                                                    inputMode="decimal"
-                                                    onBeforeInput={handlePesoInput}
-                                                    value={value || ""}
-                                                />
-                                                {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <Input
-                                                    {...field}
-                                                    placeholder="Quantidade"
-                                                    className="capitalize"
-                                                    type="number"
-                                                    value={value || ""}
-                                                />
-                                                {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
-                                            </div>
-                                        )
-                                    )}
-                                />
-                                {/* MultiSelect para Fornecedores */}
-                                <Controller
-                                    control={control}
-                                    name="fornecedores"
-                                    render={({ field: { onChange, value } }) => (
-                                        <div>
-                                            <MultiSelect
-                                                options={fornecedoresLista}
-                                                onValueChange={onChange}
-                                                defaultValue={value || []}
-                                                placeholder="Fornecedores"
-                                                variant="inverted"
-                                                animation={2}
-                                                maxCount={3}
-                                            />
-                                        </div>
-                                    )}
-                                />
-
-                                {/* MultiSelect para Categorias */}
-                                <Controller
-                                    control={control}
-                                    name="categorias"
-                                    render={({ field: { onChange, value } }) => {
-                                        return (
-                                            <div>
-                                                <MultiSelect
-                                                    options={categoriasLista}
-                                                    onValueChange={onChange}
-                                                    defaultValue={value || []}
-                                                    placeholder="Categorias"
-                                                    variant="inverted"
-                                                    animation={2}
-                                                    maxCount={3}
-                                                />
-                                            </div>
-
-                                        )
-                                    }}
-                                />
-                                <Button className="w-100" type="submit">Salvar</Button>
-                            </form>
-
-                            <DialogClose asChild>
-                                <Button variant="outline">Fechar</Button>
-                            </DialogClose>
-                        </DialogContent>
-                    </Dialog>
+                    <DialogEditProduto
+                        produto={produto}
+                        open={openEdit}
+                        onClose={() => setOpenEdit(false)}
+                        onSubmit={handleEditSubmit}
+                        fornecedoresLista={fornecedoresLista}  
+                        categoriasLista={categoriasLista}  
+                    />
 
                     {/* Modal de confirmação de exclusão */}
-                    <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Excluir Produto</DialogTitle>
-                                <DialogDescription>Confirmação de exclusão</DialogDescription>
-                            </DialogHeader>
-                            <p className="text-foreground">Tem certeza que deseja excluir o produto <span className="font-bold text-xl">"{produto.nome}"</span> ?</p>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setOpenDelete(false)}>Cancelar</Button>
-                                <Button>Excluir</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <DialogDeleteProduto
+                        open={openDelete}
+                        onClose={() => setOpenDelete(false)}
+                        onConfirm={handleDeleteProduto}
+                        produto={produto}
+                    />
                 </>
             );
         },
@@ -493,6 +346,7 @@ export function DataTable() {
                     <Button
                         variant="outline"
                         size="sm"
+                        className="rounded-2xl"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
@@ -501,6 +355,7 @@ export function DataTable() {
                     <Button
                         variant="outline"
                         size="sm"
+                        className="rounded-2xl"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >

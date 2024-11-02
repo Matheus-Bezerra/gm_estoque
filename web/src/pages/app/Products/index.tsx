@@ -6,7 +6,7 @@ import { fornecedoresLista } from "@/utils/data/products/fornecedores";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod"
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
-import { DialogAddProduto } from "./components/Datatable/Dialogs/DialogAddProduto";
+import { DialogAddProduto } from "./components/Dialogs/DialogAddProduto";
 
 
 
@@ -14,8 +14,7 @@ export const Products = () => {
     const { toast } = useToast()
 
     const addProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
-        console.log("Produtoss ", data)
-
+        console.log("Data ", data)
         toast({
             title: "Sucesso",
             description: "Produto adicionado com sucesso!",

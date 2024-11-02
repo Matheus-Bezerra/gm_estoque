@@ -40,7 +40,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
         toast({
             title: "Sucesso",
             description: "Produto adicionado com sucesso!",
-            duration: 5000,
+            duration: 4000,
             variant: "success"
         });
     };
