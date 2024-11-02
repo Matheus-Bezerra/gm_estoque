@@ -1,10 +1,10 @@
 import { Boxes, Home, LineChart, PackageOpen, PanelLeft, Tag, Users2 } from "lucide-react"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Link, useLocation } from "react-router-dom"
 import { ModeToggle } from "../theme/ModeToggle"
 import { InfoUser } from "./components/InfoUser"
+import { BreadcrumbLayout } from "./components/BreadcrumbLayout"
 export const Header = () => {
     const location = useLocation(); // Pega a localização atual
 
@@ -64,19 +64,7 @@ export const Header = () => {
                     </nav>
                 </SheetContent>
             </Sheet>
-            <Breadcrumb className="hidden md:flex">
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to="/">Início</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Produtos</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <BreadcrumbLayout />
             <div className="flex items-center md:grow-0 gap-3">
                 <ModeToggle />
                 <InfoUser />
