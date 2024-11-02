@@ -53,15 +53,14 @@ export const Products = () => {
 
     const addProduto: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
         console.log("Produtoss ", data)
+
         toast({
             title: "Sucesso",
             description: "Produto adicionado com sucesso!",
             duration: 5000,
-            variant: "default"
+            variant: "success"
         })
     }
-
-    console.log("Errors ", errors)
 
     return (
         <>

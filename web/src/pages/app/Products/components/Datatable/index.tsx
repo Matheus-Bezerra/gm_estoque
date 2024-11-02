@@ -43,7 +43,7 @@ import { fornecedoresLista } from "@/utils/data/products/fornecedores"
 import { categoriasLista } from "@/utils/data/products/categorias"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 
@@ -53,14 +53,14 @@ const formSchema = z.object({
     }),
     status: z.enum(["ativo", "inativo"]),
     tipoControle: z.enum(["quantidade", "peso"]),
-    peso: z.string().optional(),
-    quantidade: z.string().optional(),
+    peso: z.number().or(z.string()).optional(),
+    quantidade: z.number().or(z.string()).optional(),
     fornecedores: z.array(z.string()).optional(),
     categorias: z.array(z.string()).optional()
 }).refine((data) => {
-    if (data.tipoControle === "peso") return data.peso && data.peso.length > 0;
+    if (data.tipoControle === "peso") return data.peso && data.peso.toString().length > 0;
 
-    if (data.tipoControle === "quantidade") return data.quantidade && data.quantidade.length > 0;
+    if (data.tipoControle === "quantidade") return data.quantidade && data.quantidade.toString().length > 0;
     return true;
 }, {
     message: "Campo Obrigatório conforme o tipo de controle escolhido",
@@ -164,7 +164,7 @@ export const columns: ColumnDef<Produto>[] = [
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
-            const { control, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
+            const { control, handleSubmit, getValues, formState: { errors } } = useForm({
                 resolver: zodResolver(formSchema),
                 defaultValues: {
                     nome: produto.nome,
@@ -172,32 +172,21 @@ export const columns: ColumnDef<Produto>[] = [
                     tipoControle: produto.tipoControle,
                     peso: produto.peso,
                     quantidade: produto.quantidade,
-                    fornecedores: produto.fornecedores || [],
-                    categorias: produto.categorias.map(pr => pr.nome.toLowerCase()),
+                    fornecedores: produto.fornecedores.map(fr => fr.id) || [],
+                    categorias: produto.categorias.map(pr => pr.id) || []
                 },
             });
 
-            console.log("FORNECEDORESSS ", control._defaultValues.categorias)
-
-            React.useEffect(() => {
-                const tipoControle = getValues("tipoControle");
-                if (tipoControle === "peso") {
-                    setValue("quantidade", undefined); // Limpa o valor de quantidade
-                } else {
-                    setValue("peso", undefined); // Limpa o valor de peso
-                }
-            }, [getValues("tipoControle"), setValue]);
-
-            const editProduto = (data: any) => {
-                // Lógica para editar o produto
+            const editProduto: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+                
                 console.log(data);
                 toast({
                     title: "Sucesso",
                     description: "Produto Editado com sucesso!",
                     duration: 5000,
-                    variant: "default"
+                    variant: "success"
                 });
-                setOpenEdit(false); // Fecha a modal após sucesso
+                setOpenEdit(false);
             }
 
             return (
@@ -235,13 +224,16 @@ export const columns: ColumnDef<Produto>[] = [
                             </DialogHeader>
 
                             <form className="grid gap-4" onSubmit={handleSubmit(editProduto)}>
-                                <Controller
-                                    name="nome"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Input id="product-name" placeholder="Nome" {...field} />
-                                    )}
-                                />
+                                <div>
+                                    <Controller
+                                        name="nome"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Input id="product-name" placeholder="Nome" {...field} />
+                                        )}
+                                    />
+                                    {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                                </div>
                                 <Controller
                                     name="status"
                                     control={control}
@@ -281,7 +273,7 @@ export const columns: ColumnDef<Produto>[] = [
                                             ? "Peso é obrigatório."
                                             : "Quantidade é obrigatória."
                                     }}
-                                    render={({ field }) => (
+                                    render={({ field, field: {value} }) => (
                                         getValues("tipoControle") === "peso" ? (
                                             <div>
                                                 <Input
@@ -290,8 +282,9 @@ export const columns: ColumnDef<Produto>[] = [
                                                     className="capitalize"
                                                     inputMode="decimal"
                                                     onBeforeInput={handlePesoInput}
+                                                    value={value || ""}
                                                 />
-                                                {errors.peso && <span className="text-red-500">{errors.peso.message}</span>}
+                                                {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
                                             </div>
                                         ) : (
                                             <div>
@@ -300,8 +293,9 @@ export const columns: ColumnDef<Produto>[] = [
                                                     placeholder="Quantidade"
                                                     className="capitalize"
                                                     type="number"
+                                                    value={value || ""}
                                                 />
-                                                {errors.quantidade && <span className="text-red-500">{errors.quantidade.message}</span>}
+                                                {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
                                             </div>
                                         )
                                     )}
@@ -310,15 +304,18 @@ export const columns: ColumnDef<Produto>[] = [
                                 <Controller
                                     control={control}
                                     name="fornecedores"
-                                    render={({ field: { onChange } }) => (
-                                        <MultiSelect
-                                            options={fornecedoresLista}
-                                            onValueChange={onChange} 
-                                            placeholder="Fornecedores"
-                                            variant="inverted"
-                                            animation={2}
-                                            maxCount={3}
-                                        />
+                                    render={({ field: { onChange, value } }) => (
+                                        <div>
+                                            <MultiSelect
+                                                options={fornecedoresLista}
+                                                onValueChange={onChange}
+                                                defaultValue={value || []}
+                                                placeholder="Fornecedores"
+                                                variant="inverted"
+                                                animation={2}
+                                                maxCount={3}
+                                            />
+                                        </div>
                                     )}
                                 />
 
@@ -327,19 +324,21 @@ export const columns: ColumnDef<Produto>[] = [
                                     control={control}
                                     name="categorias"
                                     render={({ field: { onChange, value } }) => {
-                                        console.log("Valorrr ", categoriasLista)
                                         return (
-                                        <MultiSelect
-                                            options={categoriasLista}
-                                            onValueChange={onChange} 
-                                            defaultValue={value || []}
-                                            placeholder="Categorias"
-                                            variant="inverted"
-                                            animation={2}
-                                            maxCount={3}
-                                        />
-                                    )
-                                }}
+                                            <div>
+                                                <MultiSelect
+                                                    options={categoriasLista}
+                                                    onValueChange={onChange}
+                                                    defaultValue={value || []}
+                                                    placeholder="Categorias"
+                                                    variant="inverted"
+                                                    animation={2}
+                                                    maxCount={3}
+                                                />
+                                            </div>
+
+                                        )
+                                    }}
                                 />
                                 <Button className="w-100" type="submit">Salvar</Button>
                             </form>
