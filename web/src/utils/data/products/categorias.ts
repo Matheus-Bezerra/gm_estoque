@@ -1,9 +1,7 @@
 export const categoriasLista = [
-    { value: "comida", label: "Fornecedor A" },
-    { value: "fastFood", label: "Fornecedor B" },
-    { value: "fritura", label: "Fornecedor C" },
-    { value: "mistura", label: "Fornecedor D" },
-    { value: "assado", label: "Fornecedor E" },
-    { value: "lanches", label: "Fornecedor E" },
-    { value: "pizza", label: "Fornecedor E" },
+    { value: "comida", label: "Categoria A" },
+    { value: "fastFood", label: "Categoria B" },
+    { value: "fritura", label: "Categoria C" },
+    { value: "mistura", label: "Categoria D" },
+    { value: "assado", label: "Categoria E" }
 ];

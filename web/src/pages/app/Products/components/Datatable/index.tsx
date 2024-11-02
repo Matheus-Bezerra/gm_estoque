@@ -35,13 +35,37 @@ import {
 import { Categorias, Fornecedor, Produto } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
 import { produtos } from "@/utils/data/products"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { handlePesoInput } from "@/utils/validations/handlePesoInput"
 import { fornecedoresLista } from "@/utils/data/products/fornecedores"
 import { categoriasLista } from "@/utils/data/products/categorias"
 import { useToast } from "@/hooks/use-toast"
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+
+const formSchema = z.object({
+    nome: z.string().min(2, {
+        message: "Nome do produto deve ter no mínimo 2 caracteres",
+    }),
+    status: z.enum(["ativo", "inativo"]),
+    tipoControle: z.enum(["quantidade", "peso"]),
+    peso: z.string().optional(),
+    quantidade: z.string().optional(),
+    fornecedores: z.array(z.string()).optional(),
+    categorias: z.array(z.string()).optional()
+}).refine((data) => {
+    if (data.tipoControle === "peso") return data.peso && data.peso.length > 0;
+
+    if (data.tipoControle === "quantidade") return data.quantidade && data.quantidade.length > 0;
+    return true;
+}, {
+    message: "Campo Obrigatório conforme o tipo de controle escolhido",
+    path: ["tipoControle"]
+});
 
 export const columns: ColumnDef<Produto>[] = [
     {
@@ -138,21 +162,42 @@ export const columns: ColumnDef<Produto>[] = [
             const produto = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
-
-            const [addTipoControle, setAddTipoControle] = React.useState("quantidade")
-            const [addFornecedores, setAddFornecedores] = React.useState<string[]>([]);
-            const [addCategorias, setAddCategorias] = React.useState<string[]>([]);
             const { toast } = useToast()
 
-            const editProduto = (e: React.FormEvent) => {
-                e.preventDefault()
+            const { control, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
+                resolver: zodResolver(formSchema),
+                defaultValues: {
+                    nome: produto.nome,
+                    status: produto.status,
+                    tipoControle: produto.tipoControle,
+                    peso: produto.peso,
+                    quantidade: produto.quantidade,
+                    fornecedores: produto.fornecedores || [],
+                    categorias: produto.categorias.map(pr => pr.nome.toLowerCase()),
+                },
+            });
 
+            console.log("FORNECEDORESSS ", control._defaultValues.categorias)
+
+            React.useEffect(() => {
+                const tipoControle = getValues("tipoControle");
+                if (tipoControle === "peso") {
+                    setValue("quantidade", undefined); // Limpa o valor de quantidade
+                } else {
+                    setValue("peso", undefined); // Limpa o valor de peso
+                }
+            }, [getValues("tipoControle"), setValue]);
+
+            const editProduto = (data: any) => {
+                // Lógica para editar o produto
+                console.log(data);
                 toast({
                     title: "Sucesso",
                     description: "Produto Editado com sucesso!",
                     duration: 5000,
                     variant: "default"
-                })
+                });
+                setOpenEdit(false); // Fecha a modal após sucesso
             }
 
             return (
@@ -189,61 +234,112 @@ export const columns: ColumnDef<Produto>[] = [
                                 <DialogDescription>Altere os detalhes do produto abaixo</DialogDescription>
                             </DialogHeader>
 
-                            <form className="grid gap-4" onSubmit={editProduto}>
-                                <Input id="product-name" placeholder="Nome" />
-                                <Select value={produto.status}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
-                                        <SelectItem value="inativo"> <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                <Select value={addTipoControle} onValueChange={setAddTipoControle}>
-                                    <SelectTrigger >
-                                        <SelectValue placeholder="Tipo de Controle" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
-                                        <SelectItem value="peso">Controle: Peso</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {produto.tipoControle === "peso" ? (
-                                    <Input
-                                        placeholder="Peso (Kg)"
-                                        className="capitalize"
-                                        inputMode="decimal" // Permite números decimais
-                                        onBeforeInput={handlePesoInput} // Bloqueia caracteres especiais
-                                    />
-                                ) : (
-                                    <Input
-                                        placeholder="Quantidade"
-                                        className="capitalize"
-                                        type="number" // Somente números
-                                    />
-                                )}
-
-                                <MultiSelect
-                                    options={fornecedoresLista}
-                                    onValueChange={setAddFornecedores}
-                                    defaultValue={addFornecedores}
-                                    placeholder="Fornecedores"
-                                    variant="inverted"
-                                    animation={2}
-                                    maxCount={3}
+                            <form className="grid gap-4" onSubmit={handleSubmit(editProduto)}>
+                                <Controller
+                                    name="nome"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Input id="product-name" placeholder="Nome" {...field} />
+                                    )}
+                                />
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
+                                                <SelectItem value="inativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                                <Controller
+                                    name="tipoControle"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Tipo de Controle" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
+                                                <SelectItem value="peso">Controle: Peso</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                                {/* Renderização Condicional com Controller para Peso ou Quantidade */}
+                                <Controller
+                                    name={getValues("tipoControle") === "peso" ? "peso" : "quantidade"}
+                                    control={control}
+                                    rules={{
+                                        required: getValues("tipoControle") === "peso"
+                                            ? "Peso é obrigatório."
+                                            : "Quantidade é obrigatória."
+                                    }}
+                                    render={({ field }) => (
+                                        getValues("tipoControle") === "peso" ? (
+                                            <div>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="Peso (Kg)"
+                                                    className="capitalize"
+                                                    inputMode="decimal"
+                                                    onBeforeInput={handlePesoInput}
+                                                />
+                                                {errors.peso && <span className="text-red-500">{errors.peso.message}</span>}
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="Quantidade"
+                                                    className="capitalize"
+                                                    type="number"
+                                                />
+                                                {errors.quantidade && <span className="text-red-500">{errors.quantidade.message}</span>}
+                                            </div>
+                                        )
+                                    )}
+                                />
+                                {/* MultiSelect para Fornecedores */}
+                                <Controller
+                                    control={control}
+                                    name="fornecedores"
+                                    render={({ field: { onChange } }) => (
+                                        <MultiSelect
+                                            options={fornecedoresLista}
+                                            onValueChange={onChange} 
+                                            placeholder="Fornecedores"
+                                            variant="inverted"
+                                            animation={2}
+                                            maxCount={3}
+                                        />
+                                    )}
                                 />
 
-                                <MultiSelect
-                                    options={categoriasLista}
-                                    onValueChange={setAddCategorias}
-                                    defaultValue={addCategorias}
-                                    placeholder="Categorias"
-                                    variant="inverted"
-                                    animation={2}
-                                    maxCount={3}
+                                {/* MultiSelect para Categorias */}
+                                <Controller
+                                    control={control}
+                                    name="categorias"
+                                    render={({ field: { onChange, value } }) => {
+                                        console.log("Valorrr ", categoriasLista)
+                                        return (
+                                        <MultiSelect
+                                            options={categoriasLista}
+                                            onValueChange={onChange} 
+                                            defaultValue={value || []}
+                                            placeholder="Categorias"
+                                            variant="inverted"
+                                            animation={2}
+                                            maxCount={3}
+                                        />
+                                    )
+                                }}
                                 />
                                 <Button className="w-100" type="submit">Salvar</Button>
                             </form>
