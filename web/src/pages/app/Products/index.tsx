@@ -5,22 +5,54 @@ import { DataTable } from "./components/Datatable";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { categoriasLista } from "@/utils/data/products/categorias";
 import { fornecedoresLista } from "@/utils/data/products/fornecedores";
 import { handlePesoInput } from "@/utils/validations/handlePesoInput";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
+const formSchema = z.object({
+    nome: z.string().min(2, {
+        message: "Nome do produto deve ter no mínimo 2 caracteres",
+    }),
+    status: z.enum(["ativo", "inativo"]),
+    tipoControle: z.enum(["quantidade", "peso"]),
+    peso: z.string().optional(), 
+    quantidade: z.string().optional(), 
+    fornecedores: z.array(z.string()).optional(),
+    categorias: z.array(z.string()).optional()
+}).refine((data) => {
+    if (data.tipoControle === "peso") return data.peso && data.peso.length > 0;
+    
+    if (data.tipoControle === "quantidade") return data.quantidade && data.quantidade.length > 0;
+    return true;
+}, {
+    message: "Campo Obrigatório conforme o tipo de controle escolhido",
+    path: ["tipoControle"] 
+});
 
 export const Products = () => {
     const [addTipoControle, setAddTipoControle] = useState("quantidade")
-    const [addFornecedores, setAddFornecedores] = useState<string[]>([]);
-    const [addCategorias, setAddCategorias] = useState<string[]>([]);
     const { toast } = useToast()
 
-    const addProduto = (e: FormEvent) => {
-        e.preventDefault()
-        
+    const { handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            nome: "",
+            status: "ativo",
+            tipoControle: "quantidade",
+            peso: "",
+            quantidade: "",
+            fornecedores: [],
+            categorias: []
+        },
+    });
+
+    const addProduto: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+        console.log("Produtoss ", data)
         toast({
             title: "Sucesso",
             description: "Produto adicionado com sucesso!",
@@ -28,6 +60,8 @@ export const Products = () => {
             variant: "default"
         })
     }
+
+    console.log("Errors ", errors)
 
     return (
         <>
@@ -46,62 +80,125 @@ export const Products = () => {
                             <DialogDescription>Preencha os detalhes do produto abaixo</DialogDescription>
                         </DialogHeader>
 
-                        <form className="grid gap-4" onSubmit={addProduto}>
-                            <Input id="product-name" placeholder="Nome" />
-                            <Select value="ativo">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
-                                    <SelectItem value="inativo"> <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
-                                </SelectContent>
-                            </Select>
+                       
+                        <form className="grid gap-4" onSubmit={handleSubmit(addProduto)}>
+                            <div>
+                                <Controller
+                                    name="nome"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Nome" />
+                                    )}
+                                />
+                                {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                            </div>
 
-                            <Select value={addTipoControle} onValueChange={setAddTipoControle}>
-                                <SelectTrigger >
-                                    <SelectValue placeholder="Tipo de Controle" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
-                                    <SelectItem value="peso">Controle: Peso</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Controller
+                                name="status"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select {...field} onValueChange={field.onChange}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ativo">
+                                                <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo
+                                            </SelectItem>
+                                            <SelectItem value="inativo">
+                                                <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
+
+                            <Controller
+                                name="tipoControle"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select {...field} onValueChange={(value) => {
+                                        field.onChange(value);
+                                        setAddTipoControle(value);
+                                    }}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Tipo de Controle" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
+                                            <SelectItem value="peso">Controle: Peso</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
 
                             {addTipoControle === "peso" ? (
-                                <Input
-                                    placeholder="Peso (Kg)"
-                                    className="capitalize"
-                                    inputMode="decimal" // Permite números decimais
-                                    onBeforeInput={handlePesoInput} // Bloqueia caracteres especiais
-                                />
+                                <div>
+                                    <Controller
+                                        name="peso"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Input
+                                                {...field}
+                                                placeholder="Peso (Kg)"
+                                                className="capitalize"
+                                                inputMode="decimal"
+                                                onBeforeInput={handlePesoInput}
+                                            />
+                                        )}
+                                    />
+                                    {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                                </div>
                             ) : (
-                                <Input
-                                    placeholder="Quantidade"
-                                    className="capitalize"
-                                    type="number" // Somente números
-                                />
+                                <div>
+                                    <Controller
+                                        name="quantidade"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Input
+                                                {...field}
+                                                placeholder="Quantidade"
+                                                className="capitalize"
+                                                type="number"
+                                            />
+                                        )}
+                                    />
+                                    {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                                </div>
                             )}
 
-                            <MultiSelect
-                                options={fornecedoresLista}
-                                onValueChange={setAddFornecedores}
-                                defaultValue={addFornecedores}
-                                placeholder="Fornecedores"
-                                variant="inverted"
-                                animation={2}
-                                maxCount={3}
+                            <Controller
+                                name="fornecedores"
+                                control={control}
+                                render={({ field }) => (
+                                    <MultiSelect
+                                        options={fornecedoresLista}
+                                        onValueChange={field.onChange}
+                                        placeholder="Fornecedores"
+                                        variant="inverted"
+                                        animation={2}
+                                        maxCount={3}
+                                        {...field}
+                                    />
+                                )}
                             />
 
-                            <MultiSelect
-                                options={categoriasLista}
-                                onValueChange={setAddCategorias}
-                                defaultValue={addCategorias}
-                                placeholder="Categorias"
-                                variant="inverted"
-                                animation={2}
-                                maxCount={3}
+                            <Controller
+                                name="categorias"
+                                control={control}
+                                render={({ field }) => (
+                                    <MultiSelect
+                                        options={categoriasLista}
+                                        onValueChange={field.onChange}
+                                        placeholder="Categorias"
+                                        variant="inverted"
+                                        animation={2}
+                                        maxCount={3}
+                                        {...field}
+                                    />
+                                )}
                             />
+
                             <Button className="w-100" type="submit">Salvar</Button>
                         </form>
 
