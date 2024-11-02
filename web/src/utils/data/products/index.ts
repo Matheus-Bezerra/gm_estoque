@@ -8,12 +8,12 @@ export const produtos: Produto[] = [
         quantidade: 13,
         status: "ativo",
         fornecedores: [
-            { nome: "Fornecedor A", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"] }
+            { id: "1", nome: "Fornecedor A", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"] }
         ],
         categorias: [
-            { nome: "Comida", cor: "#FFA07A" },
-            { nome: "Fast Food", cor: "#FF6347" },
-            { nome: "Principais", cor: "#FF4500" }
+            { id: "1", nome: "Categoria A"},
+            { id: "2", nome: "Categoria B" },
+            { id: "3", nome: "Categoria C"}
         ],
         criado: new Date("2024-01-15")
     },
@@ -24,10 +24,10 @@ export const produtos: Produto[] = [
         peso: 10,
         status: "ativo",
         fornecedores: [
-            { nome: "Fornecedor B", email: "fornecedorB@example.com", produtosAssociados: ["Arroz"] }
+            { id: "2", nome: "Fornecedor B", email: "fornecedorB@example.com", produtosAssociados: ["Arroz"] }
         ],
         categorias: [
-            { nome: "Comida", cor: "#FFD700" }
+            { id: "4", nome: "Categoria D" }
         ],
         criado: new Date("2024-02-01")
     },
@@ -38,11 +38,11 @@ export const produtos: Produto[] = [
         peso: 9,
         status: "ativo",
         fornecedores: [
-            { nome: "Fornecedor C", email: "fornecedorC@example.com", produtosAssociados: ["Filé de Frango"] }
+            { id: "3", nome: "Fornecedor C", email: "fornecedorC@example.com", produtosAssociados: ["Filé de Frango"] }
         ],
         categorias: [
-            { nome: "Mistura", cor: "#8B0000" },
-            { nome: "Fritura", cor: "#FF8C00" }
+            { id: "4", nome: "Categoria D"},
+            { id: "3", nome: "Categoria C" }
         ],
         criado: new Date("2024-02-20")
     },
@@ -53,10 +53,10 @@ export const produtos: Produto[] = [
         quantidade: 7,
         status: "inativo",
         fornecedores: [
-            { nome: "Fornecedor D", email: "fornecedorD@example.com", produtosAssociados: ["Sobrecoxa"] }
+            { id: "4", nome: "Fornecedor D", email: "fornecedorD@example.com", produtosAssociados: ["Sobrecoxa"] }
         ],
         categorias: [
-            { nome: "Assado", cor: "#DEB887" }
+            { id: "3", nome: "Categoria C",  }
         ],
         criado: new Date("2024-03-05")
     },
@@ -67,11 +67,11 @@ export const produtos: Produto[] = [
         quantidade: 15,
         status: "inativo",
         fornecedores: [
-            { nome: "Fornecedor E", email: "fornecedorE@example.com", produtosAssociados: ["Pacote de Petiscos"] }
+            { id: "5", nome: "Fornecedor E", email: "fornecedorE@example.com", produtosAssociados: ["Pacote de Petiscos"] }
         ],
         categorias: [
-            { nome: "Petiscos", cor: "#D2691E" },
-            { nome: "Lanches", cor: "#FF4500" }
+            { id: "2", nome: "Categoria B", cor: "#D2691E" },
+            { id: "1", nome: "Categoria A", cor: "#FF4500" }
         ],
         criado: new Date("2024-04-10")
     }
