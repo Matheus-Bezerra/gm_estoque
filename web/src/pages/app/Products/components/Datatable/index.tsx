@@ -45,27 +45,8 @@ import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 
-
-const formSchema = z.object({
-    nome: z.string().min(2, {
-        message: "Nome do produto deve ter no mínimo 2 caracteres",
-    }),
-    status: z.enum(["ativo", "inativo"]),
-    tipoControle: z.enum(["quantidade", "peso"]),
-    peso: z.number().or(z.string()).optional(),
-    quantidade: z.number().or(z.string()).optional(),
-    fornecedores: z.array(z.string()).optional(),
-    categorias: z.array(z.string()).optional()
-}).refine((data) => {
-    if (data.tipoControle === "peso") return data.peso && data.peso.toString().length > 0;
-
-    if (data.tipoControle === "quantidade") return data.quantidade && data.quantidade.toString().length > 0;
-    return true;
-}, {
-    message: "Campo Obrigatório conforme o tipo de controle escolhido",
-    path: ["tipoControle"]
-});
 
 export const columns: ColumnDef<Produto>[] = [
     {
@@ -165,7 +146,7 @@ export const columns: ColumnDef<Produto>[] = [
             const { toast } = useToast()
 
             const { control, handleSubmit, setValue, formState: { errors } } = useForm({
-                resolver: zodResolver(formSchema),
+                resolver: zodResolver(formProdutoSchema),
                 defaultValues: {
                     nome: produto.nome,
                     status: produto.status,
@@ -179,7 +160,7 @@ export const columns: ColumnDef<Produto>[] = [
 
             const [tipoControle, setTipoControle] = React.useState<"quantidade" | "peso">(produto.tipoControle)
 
-            const editProduto: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+            const editProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
 
                 console.log(data);
                 toast({
