@@ -164,7 +164,7 @@ export const columns: ColumnDef<Produto>[] = [
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
-            const { control, handleSubmit, getValues, formState: { errors } } = useForm({
+            const { control, handleSubmit, setValue, formState: { errors } } = useForm({
                 resolver: zodResolver(formSchema),
                 defaultValues: {
                     nome: produto.nome,
@@ -177,8 +177,10 @@ export const columns: ColumnDef<Produto>[] = [
                 },
             });
 
+            const [tipoControle, setTipoControle] = React.useState<"quantidade" | "peso">(produto.tipoControle)
+
             const editProduto: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
-                
+
                 console.log(data);
                 toast({
                     title: "Sucesso",
@@ -189,6 +191,15 @@ export const columns: ColumnDef<Produto>[] = [
                 setOpenEdit(false);
             }
 
+            const handleTipoControleChange = (value: "quantidade" | "peso") => {
+                console.log(tipoControle)
+                setTipoControle(value)
+
+                setValue("quantidade", undefined)
+                setValue("peso", undefined)
+            }
+
+            
             return (
                 <>
                     <DropdownMenu>
@@ -253,7 +264,10 @@ export const columns: ColumnDef<Produto>[] = [
                                     name="tipoControle"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select value={field.value} onValueChange={field.onChange}>
+                                        <Select value={field.value} onValueChange={(value: "quantidade" | "peso") => {
+                                            field.onChange(value); 
+                                            handleTipoControleChange(value); 
+                                        }}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Tipo de Controle" />
                                             </SelectTrigger>
@@ -266,15 +280,15 @@ export const columns: ColumnDef<Produto>[] = [
                                 />
                                 {/* Renderização Condicional com Controller para Peso ou Quantidade */}
                                 <Controller
-                                    name={getValues("tipoControle") === "peso" ? "peso" : "quantidade"}
+                                    name={tipoControle === "peso" ? "peso" : "quantidade"}
                                     control={control}
                                     rules={{
-                                        required: getValues("tipoControle") === "peso"
+                                        required: tipoControle === "peso"
                                             ? "Peso é obrigatório."
                                             : "Quantidade é obrigatória."
                                     }}
-                                    render={({ field, field: {value} }) => (
-                                        getValues("tipoControle") === "peso" ? (
+                                    render={({ field, field: { value } }) => (
+                                        tipoControle === "peso" ? (
                                             <div>
                                                 <Input
                                                     {...field}
