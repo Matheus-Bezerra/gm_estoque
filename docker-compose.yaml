@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: db_postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_postgres
+    ports:
+      - "5432:5432"
+
+  api:
+    container_name: api
+    build:
+      context: ./api/
+      dockerfile: ./Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/db_postgres?schema=public
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api/src:/api/src
+      - ./api/prisma:/api/prisma
+      - ./api/tsconfig.json:/api/tsconfig.json
+      - ./api/tsconfig.build.json:/api/tsconfig.build.json
+      - ./api/nest-cli.json:/api/nest-cli.json
+      - ./api/.eslintrc.js:/api/.eslintrc.js
