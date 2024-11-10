@@ -16,7 +16,9 @@ export class ProductService {
     }
 
     async getAllProducts(): Promise<Product[]> {
-        return await this.primsa.product.findMany();
+        return await this.primsa.product.findMany({
+            include: { supplier: true , category: true }
+        });
     }
 
     async updateProduct(id: string, product: Prisma.ProductUpdateInput): Promise<Product> {

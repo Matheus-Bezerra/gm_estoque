@@ -14,25 +14,52 @@ datasource db {
 }
 
 model User {
-  id    String     @id @default(uuid())
+  id    String  @id @default(uuid())
   email String  @unique
-  name  String?
+  password String
+  name  String   @unique @db.VarChar(40)
+  
+}
+
+
+enum TypeControl {
+  UNIT
+  WEITGHT
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
 }
 
 model Product {
   id          String      @id @default(uuid())
   name        String
-  typeControl String
+  typeControl TypeControl
   quantity    Int?
   amount      Float?
-  status      String  
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt @default(now())
+  status      Status      @default(ACTIVE)
+  createAt    DateTime    @default(now())
+  updateAt    DateTime    @default(now()) @updatedAt
+  supplierId  String?
+  supplier    Supplier?   @relation(fields: [supplierId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
 }
 
 model Supplier {
-  id          String      @id @default(uuid())
-  name        String
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt @default(now())
+  id       String    @id @default(uuid())
+  name     String
+  email    String
+  createAt DateTime  @default(now())
+  updateAt DateTime  @default(now()) @updatedAt
+  products Product[] 
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  createAt DateTime  @default(now())
+  updateAt DateTime  @default(now()) @updatedAt
+  products Product[]
 }
