@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { Product ,Prisma } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/primsa.service';
 
 @Injectable()
 export class ProductService {
 
-    
+
     constructor(private primsa: PrismaService) { }
 
-    
+
     async createProduct(product: Prisma.ProductCreateInput): Promise<Product> {
         return await this.primsa.product.create({
             data: product
         });
     }
 
-    async getAllProducts(): Promise<Product[]> {
+    async getAllProducts(userId): Promise<Product[]> {
         return await this.primsa.product.findMany({
-            include: { supplier: true , category: true }
+            where: { user: { id: userId } },
+            include: { supplier: true, category: true }
         });
     }
 

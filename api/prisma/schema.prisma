@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(uuid())
-  email String  @unique
-  password String
-  name  String   @unique @db.VarChar(40)
-  
+  id         String     @id @default(uuid())
+  email      String     @unique
+  password   String
+  name       String     @unique @db.VarChar(40)
+  products   Product[]
+  suppliers  Supplier[]
+  categories Category[]
 }
-
 
 enum TypeControl {
   UNIT
@@ -44,7 +45,9 @@ model Product {
   supplierId  String?
   supplier    Supplier?   @relation(fields: [supplierId], references: [id])
   categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id])
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
 }
 
 model Supplier {
@@ -53,7 +56,9 @@ model Supplier {
   email    String
   createAt DateTime  @default(now())
   updateAt DateTime  @default(now()) @updatedAt
-  products Product[] 
+  products Product[]
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
 }
 
 model Category {
@@ -62,4 +67,6 @@ model Category {
   createAt DateTime  @default(now())
   updateAt DateTime  @default(now()) @updatedAt
   products Product[]
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
 }
