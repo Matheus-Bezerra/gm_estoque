@@ -15,9 +15,11 @@ interface DialogAddProdutoProps {
     fornecedoresLista: { label: string, value: string }[];
     categoriasLista: { label: string, value: string }[];
     onSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>>;
+    isDialogAddProdutoOpen: boolean;
+    setDialogAddProdutoOpen: (isOpen: boolean) => void;
 }
 
-export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedoresLista, categoriasLista, onSubmit }) => {
+export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedoresLista, categoriasLista, onSubmit, isDialogAddProdutoOpen, setDialogAddProdutoOpen }) => {
     const [addTipoControle, setAddTipoControle] = useState("quantidade");
     const { toast } = useToast();
 
@@ -45,7 +47,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
     };
 
     return (
-        <Dialog>
+        <Dialog open={isDialogAddProdutoOpen} onOpenChange={setDialogAddProdutoOpen}>
             <DialogTrigger asChild>
                 <Button>+ Adicionar Produto</Button>
             </DialogTrigger>

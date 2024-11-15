@@ -1,26 +1,29 @@
 import { Helmet } from "react-helmet-async";
-import { DataTable } from "./components/Datatable";
 import { useToast } from "@/hooks/use-toast";
-import { categoriasLista } from "@/utils/data/products/categorias";
-import { fornecedoresLista } from "@/utils/data/products/fornecedores";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod"
-import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
-import { DialogAddProduto } from "./components/Dialogs/DialogAddProduto";
+import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema"
+import { DialogAddFornecedor } from "./components/Dialogs/DialogAddFornecedor";
+import { produtosLista } from "@/utils/data/products/lista";
+import { DataTable } from "./components/Datatable";
+import { useState } from "react";
 
 
 
 export const Fornecedores = () => {
     const { toast } = useToast()
+    const [isDialogAdd, setIsDialogAdd] = useState(false)
 
-    const addProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
+    const addFornecedor: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
         console.log("Data ", data)
         toast({
             title: "Sucesso",
-            description: "Produto adicionado com sucesso!",
-            duration: 5000,
+            description: "Fornecedor adicionado com sucesso!",
+            duration: 4000,
             variant: "success"
         })
+
+        setIsDialogAdd(false)
     }
 
     return (
@@ -30,10 +33,11 @@ export const Fornecedores = () => {
             <p className="mt-2 text-sm text-muted-foreground">Gerencie os fornecedores associados aos produtos do seu estoque</p>
 
             <div className="mt-5">
-                <DialogAddProduto
-                    fornecedoresLista={fornecedoresLista}
-                    categoriasLista={categoriasLista}
-                    onSubmit={addProduto}
+                <DialogAddFornecedor
+                    produtosLista={produtosLista}
+                    onSubmit={addFornecedor}
+                    isDialogAddFornecedorOpen={isDialogAdd}
+                    setDialogAddFornecedorOpen={setIsDialogAdd}
                 />
             </div>
 

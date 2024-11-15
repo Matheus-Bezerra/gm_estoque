@@ -1,15 +1,19 @@
+export interface objetoAssociado {
+    value: string
+    text: string
+}
 export interface Fornecedor {
     id: string,
     nome: string,
     email: string,
-    produtosAssociados: string[]
+    produtosAssociados: objetoAssociado[]
 }
 
 export interface Categoria {
     id: string,
     nome: string,
     cor?: string // caso não vier, vai ser usada a cor padrão do sistema,
-    produtosAssociados: string[]
+    produtosAssociados: objetoAssociado[]
 }
 
 export interface Produto {

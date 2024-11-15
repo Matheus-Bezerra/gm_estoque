@@ -35,7 +35,7 @@ import {
 import { Categoria, Fornecedor, Produto } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
 import { produtos } from "@/utils/data/products"
-import { fornecedoresLista } from "@/utils/data/products/fornecedores"
+import { fornecedoresLista } from "@/utils/data/fornecedores/lista"
 import { categoriasLista } from "@/utils/data/products/categorias"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";

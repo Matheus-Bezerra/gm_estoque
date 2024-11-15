@@ -32,20 +32,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Categorias, Fornecedor, Produto } from "@/utils/data/products/interfaces"
+import { Fornecedor, objetoAssociado } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
-import { produtos } from "@/utils/data/products"
-import { fornecedoresLista } from "@/utils/data/products/fornecedores"
-import { categoriasLista } from "@/utils/data/products/categorias"
 import { useToast } from "@/hooks/use-toast"
+import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { z } from "zod";
-import {SubmitHandler } from "react-hook-form";
-import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
-import { DialogDeleteProduto } from "@/pages/app/Products/components/Dialogs/DialogDeleteProduto"
-import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/DialogEditProduto"
+import { SubmitHandler } from "react-hook-form";
+import { DialogDeleteFornecedor } from "../Dialogs/DialogDeleteFornecedor"
+import { DialogEditFornecedor } from "../Dialogs/DialogEditFornecedor"
+import { produtosLista } from "@/utils/data/products/lista"
+import { fornecedores } from "@/utils/data/fornecedores"
 
 
-export const columns: ColumnDef<Produto>[] = [
+export const columns: ColumnDef<Fornecedor>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -82,53 +81,18 @@ export const columns: ColumnDef<Produto>[] = [
         cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
     },
     {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => (
-            <div className="capitalize"><span className={`inline-block w-2.5 h-2.5 rounded-full mr-2 ${row.getValue('status') == 'ativo' ? 'bg-green-400' : 'bg-red-400'}`}></span>{row.getValue("status")}</div>
-        ),
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <div className="capitalize">{row.getValue("email")}</div>,
     },
     {
-        accessorKey: "tipoControle",
-        header: "Tipo de Controle",
-        cell: ({ row }) => <div>{row.getValue("tipoControle") === "quantidade" ? "Quantidade" : "Peso"}</div>,
-    },
-    {
-        accessorKey: "quantidade",
-        header: () => <div>Quantidade</div>,
-        cell: ({ row }) => (
-            <div>{row.getValue("quantidade") || "-"}</div>
-        ),
-        enableSorting: true,
-    },
-    {
-        accessorKey: "peso",
-        header: () => <div>Peso</div>,
-        cell: ({ row }) => (
-            <div>{row.getValue("peso") || "-"}</div>
-        ),
-        enableSorting: true,
-    },
-    {
-        accessorKey: "fornecedores",
-        header: "Fornecedores",
+        accessorKey: "produtosAssociados",
+        header: "Produtos",
         cell: ({ row }) => {
-            const fornecedores = row.getValue("fornecedores") as Fornecedor[]; // Asserção de tipo
+            const produtos = row.getValue("produtosAssociados") as objetoAssociado[]; // Asserção de tipo
             return (
                 <div>
-                    {fornecedores.map((fornecedor) => fornecedor.nome).join(", ")}
-                </div>
-            );
-        },
-    },
-    {
-        accessorKey: "categorias",
-        header: "Categorias",
-        cell: ({ row }) => {
-            const categorias = row.getValue("categorias") as Categorias[]; // Asserção de tipo
-            return (
-                <div>
-                    {categorias.map((categoria) => categoria.nome).join(", ")}
+                    {produtos.map((produto) => produto.text).join(", ")}
                 </div>
             );
         },
@@ -137,31 +101,31 @@ export const columns: ColumnDef<Produto>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const produto = row.original;
+            const fornecedor = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
-            const handleEditSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
+            const handleEditSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
                 console.log(data);
 
                 setOpenEdit(false);
 
                 toast({
                     title: "Sucesso",
-                    description: "Produto Editado com sucesso!",
+                    description: "Fornecedor Editado com sucesso!",
                     duration: 5000,
                     variant: "success"
                 });
             };
 
-            const handleDeleteProduto = () => {
-                console.log("Produto deletado!", produto)
-                setOpenDelete(false); 
+            const handleDeleteFornecedor = () => {
+                console.log("Fornecedor deletado!", fornecedor)
+                setOpenDelete(false);
 
                 toast({
                     title: "Sucesso",
-                    description: "Produto removido com sucesso!",
+                    description: "Fornecedor removido com sucesso!",
                     duration: 5000,
                     variant: "success"
                 });
@@ -195,21 +159,20 @@ export const columns: ColumnDef<Produto>[] = [
                     </DropdownMenu>
 
                     {/* Modal de edição */}
-                    <DialogEditProduto
-                        produto={produto}
+                    <DialogEditFornecedor                    
+                        fornecedor={fornecedor}
                         open={openEdit}
+                        produtosLista={produtosLista}
                         onClose={() => setOpenEdit(false)}
                         onSubmit={handleEditSubmit}
-                        fornecedoresLista={fornecedoresLista}  
-                        categoriasLista={categoriasLista}  
                     />
 
                     {/* Modal de confirmação de exclusão */}
-                    <DialogDeleteProduto
+                    <DialogDeleteFornecedor
                         open={openDelete}
                         onClose={() => setOpenDelete(false)}
-                        onConfirm={handleDeleteProduto}
-                        produto={produto}
+                        onConfirm={handleDeleteFornecedor}
+                        fornecedor={fornecedor}
                     />
                 </>
             );
@@ -227,7 +190,7 @@ export function DataTable() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
-    const data = produtos
+    const data = fornecedores
 
     const table = useReactTable({
         data,
@@ -252,7 +215,7 @@ export function DataTable() {
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Procurar produto"
+                    placeholder="Procurar fornecedor"
                     value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("nome")?.setFilterValue(event.target.value)

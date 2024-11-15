@@ -1,25 +1,25 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Produto } from "@/utils/data/products/interfaces";
+import { Fornecedor } from "@/utils/data/products/interfaces";
 
-interface DialogDeleteProdutoProps {
+interface DialogDeleteFornecedorProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    produto: Produto;
+    fornecedor: Fornecedor;
 }
 
-export function DialogDeleteProduto({ open, onClose, onConfirm, produto }: DialogDeleteProdutoProps) {
+export function DialogDeleteFornecedor({ open, onClose, onConfirm, fornecedor }: DialogDeleteFornecedorProps) {
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Excluir Produto</DialogTitle>
+                    <DialogTitle>Excluir Fornecedor</DialogTitle>
                     <DialogDescription>Confirmação de exclusão</DialogDescription>
                 </DialogHeader>
                 
                 <p className="text-foreground">
-                    Tem certeza que deseja excluir o produto <span className="font-bold text-xl">"{produto.nome}"</span>?
+                    Tem certeza que deseja excluir o Fornecedor <span className="font-bold text-xl">"{fornecedor.nome}"</span>?
                 </p>
                 
                 <DialogFooter>

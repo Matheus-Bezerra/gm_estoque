@@ -8,7 +8,10 @@ export const produtos: Produto[] = [
         quantidade: 13,
         status: "ativo",
         fornecedor: {
-            id: "1", nome: "Fornecedor A", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"]
+            id: "1", nome: "Fornecedor A", email: "fornecedorA@example.com", produtosAssociados: [
+                {text: "Hambúrguer",
+                value: "1"}
+            ]
         },
         categoria: { id: "1", nome: "Categoria A", produtosAssociados: [] },
         criado: new Date("2024-01-15")
@@ -20,7 +23,10 @@ export const produtos: Produto[] = [
         peso: 10,
         status: "ativo",
         fornecedor: {
-            id: "2", nome: "Fornecedor B", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"]
+            id: "2", nome: "Fornecedor B", email: "fornecedorA@example.com", produtosAssociados: [
+                {text: "Hambúrguer",
+                value: "1"}
+            ]
         },
         categoria: { id: "2", nome: "Categoria B", produtosAssociados: [] },
         criado: new Date("2024-02-01")
@@ -32,7 +38,10 @@ export const produtos: Produto[] = [
         peso: 9,
         status: "ativo",
         fornecedor: {
-            id: "3", nome: "Fornecedor C", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"]
+            id: "3", nome: "Fornecedor C", email: "fornecedorA@example.com", produtosAssociados: [
+                {text: "Hambúrguer",
+                value: "1"}
+            ]
         },
         categoria: { id: "3", nome: "Categoria C", produtosAssociados: [] },
         criado: new Date("2024-02-20")
@@ -44,7 +53,10 @@ export const produtos: Produto[] = [
         quantidade: 7,
         status: "inativo",
         fornecedor: {
-            id: "4", nome: "Fornecedor D", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"]
+            id: "4", nome: "Fornecedor D", email: "fornecedorA@example.com", produtosAssociados: [
+                {text: "Hambúrguer",
+                value: "1"}
+            ]
         },
         categoria: { id: "4", nome: "Categoria D", produtosAssociados: [] },
         criado: new Date("2024-03-05")
@@ -56,7 +68,10 @@ export const produtos: Produto[] = [
         quantidade: 15,
         status: "inativo",
         fornecedor: {
-            id: "5", nome: "Fornecedor E", email: "fornecedorA@example.com", produtosAssociados: ["Hambúrguer"]
+            id: "5", nome: "Fornecedor E", email: "fornecedorA@example.com", produtosAssociados: [
+                {text: "Hambúrguer",
+                value: "1"}
+            ]
         },
         categoria: { id: "5", nome: "Categoria E", produtosAssociados: [] },
         criado: new Date("2024-04-10")
