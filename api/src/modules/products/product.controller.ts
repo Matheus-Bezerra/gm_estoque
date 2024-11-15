@@ -7,8 +7,8 @@ export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
     @Get()
-    async getAllProducts() {
-        return await this.productService.getAllProducts();
+    async getAllProducts(@Param("user_id") userId: string) {
+        return await this.productService.getAllProducts(userId);
     }
 
     @Post()

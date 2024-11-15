@@ -7,8 +7,8 @@ export class SupplierController {
     constructor(private readonly supplierService: SupplierService) {}
 
     @Get()
-    getAllSuppliers() {
-        return this.supplierService.getAllSuppliers();
+    getAllSuppliers(@Param("user_id") userId: string) {
+        return this.supplierService.getAllSuppliers(userId);
     }
 
     @Post()
