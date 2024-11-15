@@ -30,6 +30,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "input-otp": "^1.4.1",
     "localforage": "^1.10.0",
     "lucide-react": "^0.446.0",
     "match-sorter": "^6.3.4",
