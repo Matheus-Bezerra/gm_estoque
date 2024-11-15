@@ -5,10 +5,11 @@ export interface Fornecedor {
     produtosAssociados: string[]
 }
 
-export interface Categorias {
+export interface Categoria {
     id: string,
     nome: string,
-    cor?: string
+    cor?: string // caso não vier, vai ser usada a cor padrão do sistema,
+    produtosAssociados: string[]
 }
 
 export interface Produto {
@@ -18,7 +19,7 @@ export interface Produto {
     quantidade?: number 
     peso?: number
     status: "ativo" | "inativo"
-    fornecedores: Fornecedor[]
-    categorias: Categorias[]
+    fornecedor?: Fornecedor | null
+    categoria?: Categoria | null
     criado: Date
 }

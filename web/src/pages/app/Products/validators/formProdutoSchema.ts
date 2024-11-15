@@ -8,8 +8,8 @@ export const formProdutoSchema = z.object({
     tipoControle: z.enum(["quantidade", "peso"]),
     peso: z.number().or(z.string()).optional(),
     quantidade: z.number().or(z.string()).optional(),
-    fornecedores: z.array(z.string()).optional(),
-    categorias: z.array(z.string()).optional()
+    fornecedor: z.string().optional(),
+    categoria: z.string().optional()
 }).refine((data) => {
     if (data.tipoControle === "peso") return data.peso && data.peso.toString().length > 0;
 

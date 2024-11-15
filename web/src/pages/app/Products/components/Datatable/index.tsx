@@ -32,7 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Categorias, Fornecedor, Produto } from "@/utils/data/products/interfaces"
+import { Categoria, Fornecedor, Produto } from "@/utils/data/products/interfaces"
 import { Button } from "@/components/ui/button"
 import { produtos } from "@/utils/data/products"
 import { fornecedoresLista } from "@/utils/data/products/fornecedores"
@@ -110,25 +110,25 @@ export const columns: ColumnDef<Produto>[] = [
         enableSorting: true,
     },
     {
-        accessorKey: "fornecedores",
-        header: "Fornecedores",
+        accessorKey: "fornecedor",
+        header: "Fornecedor",
         cell: ({ row }) => {
-            const fornecedores = row.getValue("fornecedores") as Fornecedor[]; // Asserção de tipo
+            const fornecedores = row.getValue("fornecedor") as Fornecedor; // Asserção de tipo
             return (
                 <div>
-                    {fornecedores.map((fornecedor) => fornecedor.nome).join(", ")}
+                    {fornecedores.nome}
                 </div>
             );
         },
     },
     {
-        accessorKey: "categorias",
-        header: "Categorias",
+        accessorKey: "categoria",
+        header: "Categoria",
         cell: ({ row }) => {
-            const categorias = row.getValue("categorias") as Categorias[]; // Asserção de tipo
+            const categoria = row.getValue("categoria") as Categoria; // Asserção de tipo
             return (
                 <div>
-                    {categorias.map((categoria) => categoria.nome).join(", ")}
+                    {categoria.nome}
                 </div>
             );
         },
