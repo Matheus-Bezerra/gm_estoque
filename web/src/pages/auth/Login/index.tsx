@@ -32,7 +32,7 @@ export function Login() {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
 
-    if (data.name == 'Matheus' && data.password == 'Testee') {
+    if (data.name == 'Matheus' && data.password == 'Teste@') {
       const session = {
         name: data.name,
         email: "teste@gmail.com"
