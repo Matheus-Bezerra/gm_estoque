@@ -10,6 +10,7 @@ import { Boxes } from "lucide-react"
 import { InputPassword } from "@/components/ui/input-password"
 import { useToast } from "@/hooks/use-toast"
 import { useSession } from "@/hooks/use-session"
+import { Helmet } from "react-helmet-async"
 
 const loginSchema = z.object({
   name: z.string().min(3, "Mínimo 3 caracteres"),
@@ -44,70 +45,73 @@ export function Login() {
         title: "Login inválido",
         description: "Nome de usuário ou senha incorretos. Tente novamente.",
         duration: 4000,
-        variant: "destructive" 
+        variant: "destructive"
       });
     }
   }
 
   return (
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl flex gap-3 justify-center">
-          <div
-            className={`group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground  md:h-10 md:w-10 md:text-base`}
-          >
-            <Boxes className="h-6 w-6 transition-all group-hover:scale-110" />
-            <span className="sr-only">GM Estoque</span>
-          </div>
-        </CardTitle>
-        <CardDescription>
-          Digite seus dados para entrar na sua conta
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nome do usuário</Label>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} id="name" />
-              )}
-            />
-            {errors.name && <span className="text-red-500">{errors.name.message}</span>}
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Senha</Label>
-              <Link to="/auth/esqueceu-senha" className="ml-auto inline-block text-sm underline">
-                Esqueceu sua senha?
-              </Link>
+    <>
+      <Helmet title="Entrar" />
+      <Card className="mx-auto max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl flex gap-3 justify-center">
+            <div
+              className={`group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground  md:h-10 md:w-10 md:text-base`}
+            >
+              <Boxes className="h-6 w-6 transition-all group-hover:scale-110" />
+              <span className="sr-only">GM Estoque</span>
             </div>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <InputPassword
-                  {...field}
-                  id="password"
-                  autoComplete="current-password"
-                />
-              )}
-            />
-            {errors.password && <span className="text-red-500">{errors.password.message}</span>}
+          </CardTitle>
+          <CardDescription>
+            Digite seus dados para entrar na sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Nome do usuário</Label>
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <Input {...field} id="name" />
+                )}
+              />
+              {errors.name && <span className="text-red-500">{errors.name.message}</span>}
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Senha</Label>
+                <Link to="/auth/esqueceu-senha" className="ml-auto inline-block text-sm underline">
+                  Esqueceu sua senha?
+                </Link>
+              </div>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <InputPassword
+                    {...field}
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                )}
+              />
+              {errors.password && <span className="text-red-500">{errors.password.message}</span>}
+            </div>
+            <Button type="submit" className="w-full">
+              Entrar
+            </Button>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            Não tem uma conta?{" "}
+            <Link to="/auth/cadastro" className="underline">
+              Cadastre-se
+            </Link>
           </div>
-          <Button type="submit" className="w-full">
-            Entrar
-          </Button>
-        </form>
-        <div className="mt-4 text-center text-sm">
-          Não tem uma conta?{" "}
-          <Link to="/auth/cadastro" className="underline">
-            Cadastre-se
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   )
 }
