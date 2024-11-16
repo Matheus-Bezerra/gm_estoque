@@ -28,7 +28,7 @@ export const Categorias = () => {
 
     return (
         <>
-            <Helmet title="Fornecedores" />
+            <Helmet title="Categorias" />
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Categorias</h3>
             <p className="mt-2 text-sm text-muted-foreground">Gerencie as categorias associados aos produtos do seu estoque</p>
 
