@@ -1,4 +1,4 @@
-import { Fornecedor } from "../products/interfaces";
+import { Fornecedor } from "../../../interfaces";
 export const fornecedores: Fornecedor[] = [
     {
         id: "1",

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Produto } from "@/utils/data/products/interfaces";
+import { Produto } from "@/interfaces";
 
 interface DialogDeleteProdutoProps {
     open: boolean;

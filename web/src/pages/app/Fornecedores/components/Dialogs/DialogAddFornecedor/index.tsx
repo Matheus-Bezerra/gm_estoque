@@ -35,7 +35,7 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
             variant: "success"
         });
     };
-
+    
     return (
         <Dialog open={isDialogAddFornecedorOpen} onOpenChange={setDialogAddFornecedorOpen}>
             <DialogTrigger asChild>

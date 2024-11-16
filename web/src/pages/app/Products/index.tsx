@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { DataTable } from "./components/Datatable";
 import { useToast } from "@/hooks/use-toast";
-import { categoriasLista } from "@/utils/data/products/categorias";
+import { categoriasLista } from "@/utils/data/categorias/lista";
 import { fornecedoresLista } from "@/utils/data/fornecedores/lista";
 import { SubmitHandler } from "react-hook-form"; 
 import { z } from "zod"

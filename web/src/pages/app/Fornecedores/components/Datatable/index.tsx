@@ -11,7 +11,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, SquarePen, Trash2 } from "lucide-react"
+import { ArrowUpDown, Boxes, ChevronDown, MoreHorizontal, SquarePen, Trash2 } from "lucide-react"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -32,16 +32,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Fornecedor, objetoAssociado } from "@/utils/data/products/interfaces"
+import { Fornecedor, objetoAssociado } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteFornecedor } from "../Dialogs/DialogDeleteFornecedor"
 import { DialogEditFornecedor } from "../Dialogs/DialogEditFornecedor"
 import { produtosLista } from "@/utils/data/products/lista"
 import { fornecedores } from "@/utils/data/fornecedores"
+import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
+import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
+import { formFornecedorSchema } from "../../validators/formFornecedorSchema"
 
 
 export const columns: ColumnDef<Fornecedor>[] = [
@@ -103,6 +105,7 @@ export const columns: ColumnDef<Fornecedor>[] = [
         cell: ({ row }) => {
             const fornecedor = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
+            const [openAssociarProdutos, setOpenAssociarProdutos] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
@@ -114,7 +117,20 @@ export const columns: ColumnDef<Fornecedor>[] = [
                 toast({
                     title: "Sucesso",
                     description: "Fornecedor Editado com sucesso!",
-                    duration: 5000,
+                    duration: 4000,
+                    variant: "success"
+                });
+            };
+
+            const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
+                console.log("Dataaa ", data);
+
+                setOpenAssociarProdutos(false);
+
+                toast({
+                    title: "Sucesso",
+                    description: "Produtos associados com sucesso",
+                    duration: 4000,
                     variant: "success"
                 });
             };
@@ -126,7 +142,7 @@ export const columns: ColumnDef<Fornecedor>[] = [
                 toast({
                     title: "Sucesso",
                     description: "Fornecedor removido com sucesso!",
-                    duration: 5000,
+                    duration: 4000,
                     variant: "success"
                 });
             };
@@ -150,6 +166,11 @@ export const columns: ColumnDef<Fornecedor>[] = [
                                 <SquarePen className="h-4 w-4 mr-2" /> Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                                onClick={() => setOpenAssociarProdutos(true)}
+                            >
+                                <Boxes className="h-4 w-4 mr-2" /> Produtos associados
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 onClick={() => setOpenDelete(true)}
                                 className="cursor-pointer text-red-400 hover:bg-muted-foreground"
                             >
@@ -159,12 +180,20 @@ export const columns: ColumnDef<Fornecedor>[] = [
                     </DropdownMenu>
 
                     {/* Modal de edição */}
-                    <DialogEditFornecedor                    
+                    <DialogEditFornecedor
                         fornecedor={fornecedor}
                         open={openEdit}
                         produtosLista={produtosLista}
                         onClose={() => setOpenEdit(false)}
                         onSubmit={handleEditSubmit}
+                    />
+
+                    <DialogAssociarProdutos
+                        fornecedor={fornecedor}
+                        open={openAssociarProdutos}
+                        produtosLista={produtosLista}
+                        onClose={() => setOpenAssociarProdutos(false)}
+                        onSubmit={handleAssociarSubmit}
                     />
 
                     {/* Modal de confirmação de exclusão */}

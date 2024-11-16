@@ -8,7 +8,7 @@ import { handlePesoInput } from "@/utils/validations/handlePesoInput";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Produto } from "@/utils/data/products/interfaces";
+import { Produto } from "@/interfaces";
 
 interface DialogEditProdutoProps {
     produto: Produto;

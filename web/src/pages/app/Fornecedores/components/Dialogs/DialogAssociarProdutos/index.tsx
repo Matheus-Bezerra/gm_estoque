@@ -1,79 +1,52 @@
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Fornecedor } from "@/interfaces";
+import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
 
-interface DialogEditFornecedorProps {
+interface DialogAssociarProdutos {
     fornecedor: Fornecedor;
-    onSubmit: SubmitHandler<FornecedorFormValues>;
+    onSubmit: SubmitHandler<FornecedorAssociarValues>;
     open: boolean;
     onClose: (open: boolean) => void;
     produtosLista: { label: string, value: string }[];
 }
 
+type FornecedorAssociarValues = z.infer<typeof formAssociarProdutosSchema>;
 
-type FornecedorFormValues = z.infer<typeof formFornecedorSchema>;
-
-export function DialogEditFornecedor({
+export function DialogAssociarProdutos({
     fornecedor,
     onSubmit,
     open,
     onClose,
     produtosLista
-}: DialogEditFornecedorProps) {
-    const { control, handleSubmit, formState: { errors } } = useForm<FornecedorFormValues>({
-        resolver: zodResolver(formFornecedorSchema),
+}: DialogAssociarProdutos) {
+    const { control, handleSubmit } = useForm<FornecedorAssociarValues>({
+        resolver: zodResolver(formAssociarProdutosSchema),
         defaultValues: {
-            nome: fornecedor.nome,
-            email: fornecedor.email,
             produtos: fornecedor.produtosAssociados.map(pa => pa.value)
         },
     });
-
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Editar Fornecedor</DialogTitle>
-                    <DialogDescription>Altere os detalhes do fornecedor abaixo</DialogDescription>
+                    <DialogTitle>Produtos associados</DialogTitle>
+                    <DialogDescription>Associe {fornecedor.nome} para os produtos disponíveis</DialogDescription>
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-                    <div>
-                        <Controller
-                            name="nome"
-                            control={control}
-                            render={({ field }) => (
-                                <Input id="nome" placeholder="Nome" {...field} />
-                            )}
-                        />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
-                    </div>
-
-                    <div>
-                        <Controller
-                            name="email"
-                            control={control}
-                            render={({ field }) => (
-                                <Input id="email" placeholder="E-mail" {...field} />
-                            )}
-                        />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
-                    </div>
-
-
                     {/* MultiSelect para Fornecedores */}
                     <Controller
                         control={control}
                         name="produtos"
                         render={({ field: { onChange, value } }) => {
-                            
+
                             return (
                                 <div>
                                     <MultiSelect
