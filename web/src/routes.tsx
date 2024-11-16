@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./utils/Protected/ProtectedRoute"
 import { EsqueceuSenha } from "./pages/auth/EsqueceuSenha"
 import { SenhaCodigo } from "./pages/auth/SenhaCodigo"
 import { NovaSenha } from "./pages/auth/NovaSenha"
+import { Categorias } from "./pages/app/Categorias"
 
 export const router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/fornecedores",
                         element: <Fornecedores />
+                    },
+                    {
+                        path: "/categorias",
+                        element: <Categorias />
                     },
                 ]
             }

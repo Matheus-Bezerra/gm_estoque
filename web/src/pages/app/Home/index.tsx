@@ -18,28 +18,28 @@ export const Home = () => {
                         title="Produtos cadastrados"
                         value={48}
                         linkText="produtos"
-                        linkUrl="/"
+                        linkUrl="/produtos"
                         Icon={Boxes} // Usando o ícone do Lucide
                     />
                     <CardInfo
                         title="Produtos zerados"
                         value={3}
                         linkText="produtos"
-                        linkUrl="/"
+                        linkUrl="/produtos"
                         Icon={Upload}
                     />
                     <CardInfo
                         title="Total de Fornecedores"
                         value={12}
                         linkText="Fornecedores"
-                        linkUrl="/"
+                        linkUrl="/fornecedores"
                         Icon={Users}
                     />
                     <CardInfo
                         title="Total de Categorias"
                         value={24}
                         linkText="Categorias"
-                        linkUrl="/"
+                        linkUrl="/categorias"
                         Icon={Tag}
                     />
                 </div>

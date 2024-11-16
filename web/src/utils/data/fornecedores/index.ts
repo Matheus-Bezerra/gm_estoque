@@ -46,8 +46,8 @@ export const fornecedores: Fornecedor[] = [
         email: "luizPereira@gmail.com",
         nome: "Luiz Pereira",
         produtosAssociados: [
-            { value: "8", text: "Produto G" },
-            { value: "9", text: "Produto H" }
+            { value: "4", text: "Produto D" },
+            { value: "2", text: "Produto B" }
         ]
     }
 ];

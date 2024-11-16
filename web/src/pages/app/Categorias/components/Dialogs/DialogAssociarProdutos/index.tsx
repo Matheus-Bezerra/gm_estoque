@@ -2,14 +2,13 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Fornecedor } from "@/interfaces";
 import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
+import { Categoria } from "@/interfaces";
 
 interface DialogAssociarProdutos {
-    fornecedor: Fornecedor;
+    categoria: Categoria;
     onSubmit: SubmitHandler<FornecedorAssociarValues>;
     open: boolean;
     onClose: (open: boolean) => void;
@@ -19,7 +18,7 @@ interface DialogAssociarProdutos {
 type FornecedorAssociarValues = z.infer<typeof formAssociarProdutosSchema>;
 
 export function DialogAssociarProdutos({
-    fornecedor,
+    categoria,
     onSubmit,
     open,
     onClose,
@@ -28,7 +27,7 @@ export function DialogAssociarProdutos({
     const { control, handleSubmit } = useForm<FornecedorAssociarValues>({
         resolver: zodResolver(formAssociarProdutosSchema),
         defaultValues: {
-            produtos: fornecedor.produtosAssociados.map(pa => pa.value)
+            produtos: categoria.produtosAssociados.map(pa => pa.value)
         },
     });
 
@@ -37,7 +36,7 @@ export function DialogAssociarProdutos({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Produtos associados</DialogTitle>
-                    <DialogDescription>Associe "{fornecedor.nome}" para os produtos disponíveis</DialogDescription>
+                    <DialogDescription>Associe a categoria "{categoria.nome}" para os produtos disponíveis</DialogDescription>
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
