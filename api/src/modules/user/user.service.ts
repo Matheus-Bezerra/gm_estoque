@@ -10,6 +10,12 @@ export class UserService {
     constructor(private primsa: PrismaService) { }
 
 
+    async findOne(username: string): Promise<User | undefined> {
+        return await this.primsa.user.findUnique({
+            where: { name: username }
+        })
+    }
+
     async createUser(user: Prisma.UserCreateInput): Promise<User> {
         user.password = hash('sha256', user.password);
         return await this.primsa.user.create({

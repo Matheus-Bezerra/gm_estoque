@@ -1,24 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+
+import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { login } from './domain/login.interface';
-import { UserNotFoundError } from './domain/userNotFoundError';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  signIn(@Body() signInDto: Record<string, any>) {
+    console.log("signInDto");
+    console.log(signInDto);
+    return this.authService.signIn(signInDto.username, signInDto.password);
+  }
 
-
-    @Post()
-    login(@Body() params: login, @Res() res) {
-        const response =  this.authService.checkLogin(params);
-
-        if(response instanceof UserNotFoundError)
-            res.status(404).send(response);
-
-        res.status(200).send(response);
-
-    }
-
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return req.user;
+  }
 }
