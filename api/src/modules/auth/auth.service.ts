@@ -7,8 +7,8 @@ import { hash } from 'crypto';
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService
   ) {}
 
   async signIn(
@@ -20,9 +20,7 @@ export class AuthService {
     if (user.password !== passHash) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, username: user.name };
-    console.log("payload");
-    console.log(payload);
+    const payload = { id: user.id, username: user.name };
      
     return {
       access_token: await this.jwtService.signAsync(payload),

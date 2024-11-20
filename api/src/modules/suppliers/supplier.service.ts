@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Supplier, Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/primsa.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SupplierService {
 
 
-    constructor(private primsa: PrismaService) { }
+    constructor(private prisma: PrismaService) { }
 
 
-    async createSupplier(supplier: Prisma.SupplierCreateInput): Promise<Supplier> {
-        return await this.primsa.supplier.create({
+    async createSupplier(userId: string, supplier: Prisma.SupplierCreateInput): Promise<Supplier> {
+        supplier.user = { connect: { id: userId } };
+        return await this.prisma.supplier.create({
             data: supplier
         });
     }
 
-    async getAllSuppliers(userId): Promise<Supplier[]> {
-        return await this.primsa.supplier.findMany(
+    async getAllSuppliers(userId: string): Promise<Supplier[]> {
+        return await this.prisma.supplier.findMany(
             {
                 where: { user: { id: userId } },
                 include: { products: true }
@@ -25,14 +26,14 @@ export class SupplierService {
     }
 
     async updateSupplier(id: string, supplier: Prisma.SupplierUpdateInput): Promise<Supplier> {
-        return await this.primsa.supplier.update({
+        return await this.prisma.supplier.update({
             where: { id },
             data: supplier
         });
     }
 
     async deleteSupplier(id: string): Promise<Supplier> {
-        return await this.primsa.supplier.delete({
+        return await this.prisma.supplier.delete({
             where: { id }
         });
     }

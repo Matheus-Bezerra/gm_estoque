@@ -1,37 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/primsa.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { hash } from 'crypto';
 
 @Injectable()
 export class UserService {
 
 
-    constructor(private primsa: PrismaService) { }
+    constructor(private prisma: PrismaService) { }
 
 
     async findOne(username: string): Promise<User | undefined> {
-        return await this.primsa.user.findUnique({
+        return await this.prisma.user.findUnique({
             where: { name: username }
         })
     }
 
     async createUser(user: Prisma.UserCreateInput): Promise<User> {
         user.password = hash('sha256', user.password);
-        return await this.primsa.user.create({
+        return await this.prisma.user.create({
             data: user
         });
     }
 
     async updateUser(id: string, user: Prisma.UserUpdateInput): Promise<User> {
-        return await this.primsa.user.update({
+        return await this.prisma.user.update({
             where: { id },
             data: user
         });
     }
 
     async deleteUser(id: string): Promise<User> {
-        return await this.primsa.user.delete({
+        return await this.prisma.user.delete({
             where: { id }
         });
     }

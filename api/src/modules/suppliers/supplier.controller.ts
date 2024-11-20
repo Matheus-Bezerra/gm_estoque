@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { SupplierService } from './supplier.service';
 
@@ -7,13 +7,13 @@ export class SupplierController {
     constructor(private readonly supplierService: SupplierService) {}
 
     @Get()
-    getAllSuppliers(@Param("user_id") userId: string) {
-        return this.supplierService.getAllSuppliers(userId);
+    getAllSuppliers(@Request() req) {
+        return this.supplierService.getAllSuppliers(req.user.id);
     }
 
     @Post()
-    createSupplier(@Body() supplier: Prisma.SupplierCreateInput) {
-        return this.supplierService.createSupplier(supplier);
+    createSupplier(@Request() req, @Body() supplier: Prisma.SupplierCreateInput) {
+        return this.supplierService.createSupplier(req.user.id, supplier);
     }
 
     @Put(':id')

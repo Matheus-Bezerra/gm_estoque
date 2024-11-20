@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ProductService } from './product.service';
 
@@ -7,13 +7,13 @@ export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
     @Get()
-    async getAllProducts(@Param("user_id") userId: string) {
-        return await this.productService.getAllProducts(userId);
+    async getAllProducts(@Request() req) {
+        return await this.productService.getAllProducts(req.user.id);
     }
 
     @Post()
-    async createProduct(@Body() product: Prisma.ProductCreateInput) {
-        return await this.productService.createProduct(product);
+    async createProduct(@Request() req, @Body() product: Prisma.ProductCreateInput) {
+        return await this.productService.createProduct(req.user.id,product);
     }
 
     @Put(':id')
