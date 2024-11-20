@@ -43,6 +43,9 @@ import {SubmitHandler } from "react-hook-form";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 import { DialogDeleteProduto } from "@/pages/app/Products/components/Dialogs/DialogDeleteProduto"
 import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/DialogEditProduto"
+import { api } from "@/axios"
+import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export const columns: ColumnDef<Produto>[] = [
@@ -218,19 +221,25 @@ export const columns: ColumnDef<Produto>[] = [
 
 ]
 
-
 export function DataTable() {
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
-    const data = produtos
+
+    // Buscar os produtos da API usando a nova versão do useQuery
+    const { data: produtos = [], isLoading, isError } = useQuery({
+        queryKey: ["products"],
+        queryFn: async () => {
+            const response = await api.get("/product")
+
+            console.log("Responseee ", response)
+            return []
+        },
+    })
 
     const table = useReactTable({
-        data,
+        data: produtos, // Dados retornados pela API
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -247,6 +256,23 @@ export function DataTable() {
             rowSelection,
         },
     })
+
+    if (isLoading) {
+        return (
+            <div className="w-full">
+                <Skeleton className="h-10 w-full mb-4 mt-4" />
+                <Skeleton className="h-44 w-full" />
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="text-center text-red-500">
+                Erro ao carregar os produtos. Tente novamente mais tarde.
+            </div>
+        )
+    }
 
     return (
         <div className="w-full">
