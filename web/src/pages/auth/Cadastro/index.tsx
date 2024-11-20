@@ -1,3 +1,4 @@
+import { api } from "@/axios"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -52,15 +53,34 @@ export function Cadastro() {
     const onSubmit: SubmitHandler<CadastroFormInputs> = (data) => {
         console.log("Dados do Cadastro ", data)
 
-        // Chegou aqui é sucesso
-        toast({
-            title: "Sucesso",
-            description: "Usuário Cadastrado com sucesso",
-            duration: 3000,
-            variant: "success"
-        });
+        const user = {
+            name: data.name,
+            email: data.email,
+            password: data.confirmPassword
+        }
+        api.post("/user", user)
+            .then(() => {
+                toast({
+                    title: "Sucesso",
+                    description: "Usuário Cadastrado com sucesso",
+                    duration: 3000,
+                    variant: "success"
+                });
 
-        navigate("/auth");
+                navigate("/auth");
+            })
+            .catch(error => {
+                console.error("Error", error)
+
+                toast({
+                    title: "Erro",
+                    description: "Houve um terro tente novamente mais tarde!",
+                    duration: 3000,
+                    variant: "destructive"
+                });
+            })
+
+
     }
 
     return (

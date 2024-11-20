@@ -11,9 +11,10 @@ import { InputPassword } from "@/components/ui/input-password"
 import { useToast } from "@/hooks/use-toast"
 import { useSession } from "@/hooks/use-session"
 import { Helmet } from "react-helmet-async"
+import { api } from "@/axios"
 
 const loginSchema = z.object({
-  name: z.string().min(3, "Mínimo 3 caracteres"),
+  username: z.string().min(3, "Mínimo 3 caracteres"),
   password: z.string().min(6, "A senha tem no mínimo 6 caracteres"),
 })
 
@@ -23,31 +24,50 @@ export function Login() {
   const { handleSubmit, control, formState: { errors } } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      name: "",
+      username: "",
       password: ""
     }
   })
   const { toast } = useToast()
   const navigate = useNavigate();
-  const { setSession } = useSession();
+  const { setSession, setToken } = useSession();
 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
+    api.post("/auth/login", data)
+      .then(response => {
+        const token = response.data.access_token
+        setToken(token)
+        localStorage.setItem('@gm_estoque/token', token);
 
-    if (data.name == 'Matheus' && data.password == 'Teste@') {
-      const session = {
-        name: data.name,
-        email: "teste@gmail.com"
-      }
-      setSession(session)
-      navigate("/");
-    } else {
-      toast({
-        title: "Login inválido",
-        description: "Nome de usuário ou senha incorretos. Tente novamente.",
-        duration: 4000,
-        variant: "destructive"
-      });
-    }
+        api.get("/auth/profile")
+          .then(response => {
+            const session = {
+              username: response.data.username,
+              email: "teste@gmail.com"
+            }
+            setSession(session)
+            navigate("/");
+          })
+          .catch(error => {
+            console.error("Error Auth Profile ", error)
+            toast({
+              title: "Login incorreto",
+              description: "Preencha os dados corretamente para entrar na aplicação",
+              duration: 4000,
+              variant: "destructive"
+            });
+          })
+      })
+      .catch(error => {
+        console.log("Error ", error)
+
+        toast({
+          title: "Erro",
+          description: "Houve algum erro, tente novamente mais tarde",
+          duration: 4000,
+          variant: "destructive"
+        });
+      })
   }
 
   return (
@@ -72,13 +92,13 @@ export function Login() {
             <div className="grid gap-2">
               <Label htmlFor="name">Nome do usuário</Label>
               <Controller
-                name="name"
+                name="username"
                 control={control}
                 render={({ field }) => (
                   <Input {...field} id="name" />
                 )}
               />
-              {errors.name && <span className="text-red-500">{errors.name.message}</span>}
+              {errors.username && <span className="text-red-500">{errors.username.message}</span>}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">

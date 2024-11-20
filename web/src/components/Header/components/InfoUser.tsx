@@ -25,7 +25,7 @@ export const InfoUser = () => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{session?.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>{session?.username}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer hover:bg-muted-foreground">
                     <Bolt className="h-4 w-4 mr-2" />  <span>Configurações</span>
