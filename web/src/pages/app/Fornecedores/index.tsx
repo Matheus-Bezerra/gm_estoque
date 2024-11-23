@@ -42,7 +42,7 @@ export const Fornecedores = () => {
                 console.error("Erro ", error)
                 toast({
                     title: "Erro",
-                    description: `Erro ao Fornecedor produto: ${error.message}`,
+                    description: `Erro ao adicionar fornecedor: ${error.message}`,
                     duration: 4000,
                     variant: "destructive",
                 });
@@ -60,8 +60,6 @@ export const Fornecedores = () => {
             return response.data;
         },
     });
-
-    console.log("Produtoss Associados ", produtosAssociados)
 
     return (
         <>

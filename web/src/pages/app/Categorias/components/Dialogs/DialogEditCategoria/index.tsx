@@ -5,17 +5,17 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Categoria } from "@/interfaces";
+import { CategoriaApi, ProdutoApi } from "@/interfaces";
 import { formCategoriaSchema } from "../../../validators/formCategoriaSchema";
 import { Brush } from "lucide-react";
 import { useRef } from "react";
 
 interface DialogEditCategoriaProps {
-    categoria: Categoria;
+    categoria: CategoriaApi;
     onSubmit: SubmitHandler<CategoriaFormValues>;
     open: boolean;
     onClose: (open: boolean) => void;
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
 }
 
 
@@ -31,9 +31,9 @@ export function DialogEditCategoria({
     const { control, handleSubmit, formState: { errors } } = useForm<CategoriaFormValues>({
         resolver: zodResolver(formCategoriaSchema),
         defaultValues: {
-            nome: categoria.nome,
-            cor: categoria?.cor,
-            produtos: categoria.produtosAssociados.map(pa => pa.value)
+            name: categoria.name,
+            color: categoria?.color,
+            productsIds: categoria.products.map(pa => pa.id)
         },
     });
 
@@ -44,6 +44,9 @@ export function DialogEditCategoria({
             inputRef.current.click();
         }
     };
+    const produtosSelect = produtosLista.map(pa => {
+        return { label: pa.name, value: pa.id }
+    })
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
@@ -56,18 +59,18 @@ export function DialogEditCategoria({
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
                                 <Input id="nome" placeholder="Nome" {...field} />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>
 
                     <div>
                         <Controller
-                            name="cor"
+                            name="color"
                             control={control}
                             render={({ field }) => (
                                 <>
@@ -87,20 +90,20 @@ export function DialogEditCategoria({
 
                             )}
                         />
-                        {errors.cor && <span className="text-red-500">{errors.cor.message}</span>}
+                        {errors.color && <span className="text-red-500">{errors.color.message}</span>}
                     </div>
 
 
                     {/* MultiSelect para Fornecedores */}
                     <Controller
                         control={control}
-                        name="produtos"
+                        name="productsIds"
                         render={({ field: { onChange, value } }) => {
 
                             return (
                                 <div>
                                     <MultiSelect
-                                        options={produtosLista}
+                                        options={produtosSelect}
                                         onValueChange={onChange}
                                         defaultValue={value || []}
                                         placeholder="Produtos"

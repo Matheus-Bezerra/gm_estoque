@@ -15,18 +15,23 @@ interface DialogAddFornecedorProps {
     setDialogAddFornecedorOpen: (isOpen: boolean) => void;
 }
 
+const valoresPadraoAdicionarFornecedor: z.infer<typeof formFornecedorSchema> = {
+    name: "",
+    email: ""
+}
+
 export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produtosLista, onSubmit, isDialogAddFornecedorOpen, setDialogAddFornecedorOpen }) => {
 
-    const { handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formFornecedorSchema>>({
+    const { handleSubmit, control, formState: { errors }, reset } = useForm<z.infer<typeof formFornecedorSchema>>({
         resolver: zodResolver(formFornecedorSchema),
-        defaultValues: {
-            name: "",
-            email: ""
-        }
+        defaultValues: valoresPadraoAdicionarFornecedor
     });
 
     const handleFormSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
-        onSubmit(data);
+        try {
+            onSubmit(data);
+            reset(valoresPadraoAdicionarFornecedor)
+        } catch (err) {}
     };
 
     const produtosSelect = produtosLista.map(pa => {

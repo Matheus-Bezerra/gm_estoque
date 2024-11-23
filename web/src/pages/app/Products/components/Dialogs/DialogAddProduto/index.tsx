@@ -39,9 +39,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
         try {
             onSubmit(data);
             reset(valoresPadraoAdicionarProduto)
-        } catch (err) {
-
-        }
+        } catch (err) {}
     };
 
     return (

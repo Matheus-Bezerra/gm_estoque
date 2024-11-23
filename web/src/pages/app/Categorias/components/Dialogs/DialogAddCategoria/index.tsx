@@ -2,25 +2,29 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formCategoriaSchema } from "@/pages/app/Categorias/validators/formCategoriaSchema";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Brush } from "lucide-react";
 import { useRef } from "react";
+import { ProdutoApi } from "@/interfaces";
 
 interface DialogAddCategoriaProps {
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
     onSubmit: SubmitHandler<CategoriaFormValues>;
     isDialogAddCategoriaOpen: boolean;
     setDialogAddCategoriaOpen: (isOpen: boolean) => void;
 }
 
 type CategoriaFormValues = z.infer<typeof formCategoriaSchema>;
+const valoresPadraoAdicionarCategoria: z.infer<typeof formCategoriaSchema> = {
+    name: "",
+    color: "#dc2626"
+}
+
 
 export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtosLista, onSubmit, isDialogAddCategoriaOpen, setDialogAddCategoriaOpen }) => {
-    const { toast } = useToast();
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleBrushClick = () => {
@@ -29,25 +33,21 @@ export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtos
         }
     };
 
-    const { handleSubmit, control, formState: { errors } } = useForm<CategoriaFormValues>({
+    const { handleSubmit, control, formState: { errors }, reset } = useForm<CategoriaFormValues>({
         resolver: zodResolver(formCategoriaSchema),
-        defaultValues: {
-            nome: "",
-            cor: "#dc2626"
-        }
+        defaultValues: valoresPadraoAdicionarCategoria
     });
 
     const handleFormSubmit: SubmitHandler<z.infer<typeof formCategoriaSchema>> = (data) => {
-        onSubmit(data);
-        toast({
-            title: "Sucesso",
-            description: "Categoria adicionado com sucesso!",
-            duration: 4000,
-            variant: "success"
-        });
+        try {
+            onSubmit(data);
+            reset(valoresPadraoAdicionarCategoria)
+        } catch (err) {}
     };
 
-
+    const produtosSelect = produtosLista.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
 
     return (
         <Dialog open={isDialogAddCategoriaOpen} onOpenChange={setDialogAddCategoriaOpen}>
@@ -64,18 +64,18 @@ export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtos
                 <form className="grid gap-4" onSubmit={handleSubmit(handleFormSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
                                 <Input {...field} placeholder="Nome" />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>
 
                     <div>
                         <Controller
-                            name="cor"
+                            name="color"
                             control={control}
                             render={({ field }) => (
                                 <>
@@ -95,16 +95,16 @@ export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtos
 
                             )}
                         />
-                        {errors.cor && <span className="text-red-500">{errors.cor.message}</span>}
+                        {errors.color && <span className="text-red-500">{errors.color.message}</span>}
                     </div>
 
 
                     <Controller
-                        name="produtos"
+                        name="productsIds"
                         control={control}
                         render={({ field }) => (
                             <MultiSelect
-                                options={produtosLista}
+                                options={produtosSelect}
                                 onValueChange={field.onChange}
                                 placeholder="Produtos"
                                 variant="inverted"

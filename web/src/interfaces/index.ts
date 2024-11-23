@@ -28,6 +28,16 @@ export interface Produto {
     criado: Date
 }
 
+export interface CategoriaApi {
+    id: string,
+    name: string,
+    color?: string // caso não vier, vai ser usada a cor padrão do sistema,
+    createdAt: Date,
+    updateAt: string,
+    userId: string,
+    products: ProdutoApi[]
+}
+
 export interface FornecedorAPI {
     id: string,
     name: string,

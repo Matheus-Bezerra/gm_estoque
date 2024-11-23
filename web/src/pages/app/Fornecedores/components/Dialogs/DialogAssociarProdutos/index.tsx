@@ -27,7 +27,7 @@ export function DialogAssociarProdutos({
     const { control, handleSubmit } = useForm<FornecedorAssociarValues>({
         resolver: zodResolver(formAssociarProdutosSchema),
         defaultValues: {
-            produtos: fornecedor.products.map(pa => pa.id)
+            productsId: fornecedor.products.map(pa => pa.id)
         },
     });
     const produtosSelect = produtosLista.map(pa => {
@@ -46,7 +46,7 @@ export function DialogAssociarProdutos({
                     {/* MultiSelect para Fornecedores */}
                     <Controller
                         control={control}
-                        name="produtos"
+                        name="productsId"
                         render={({ field: { onChange, value } }) => {
 
                             return (

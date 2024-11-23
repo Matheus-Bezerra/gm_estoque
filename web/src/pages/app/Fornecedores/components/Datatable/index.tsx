@@ -128,6 +128,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
                     });
 
                     setOpenEdit(false)
+                    setOpenAssociarProdutos(false)
                 },
                 onError: (error) => {
                     console.error("Erro ", error)
@@ -145,15 +146,12 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
             };
 
             const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
-                console.log("Dataaa ", data);
-                setOpenAssociarProdutos(false);
-
-                toast({
-                    title: "Sucesso",
-                    description: "Produtos associados com sucesso",
-                    duration: 4000,
-                    variant: "success"
-                });
+                const dataEdiSupplier = {
+                    name: fornecedor.name,
+                    email: fornecedor.email,
+                    productsIds: data.productsId
+                }
+              editarProdutoMutation.mutate(dataEdiSupplier)
             };
 
             const deletarFornecedorMutation = useMutation({

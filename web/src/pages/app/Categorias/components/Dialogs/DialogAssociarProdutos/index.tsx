@@ -5,14 +5,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
-import { Categoria } from "@/interfaces";
+import { CategoriaApi, ProdutoApi } from "@/interfaces";
 
 interface DialogAssociarProdutos {
-    categoria: Categoria;
+    categoria: CategoriaApi;
     onSubmit: SubmitHandler<FornecedorAssociarValues>;
     open: boolean;
     onClose: (open: boolean) => void;
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
 }
 
 type FornecedorAssociarValues = z.infer<typeof formAssociarProdutosSchema>;
@@ -27,29 +27,33 @@ export function DialogAssociarProdutos({
     const { control, handleSubmit } = useForm<FornecedorAssociarValues>({
         resolver: zodResolver(formAssociarProdutosSchema),
         defaultValues: {
-            produtos: categoria.produtosAssociados.map(pa => pa.value)
+            productsId: categoria.products.map(pa => pa.id)
         },
     });
+    const produtosSelect = produtosLista.map(pa => {
+        return { label: pa.name, value: pa.id }
+    })
+
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Produtos associados</DialogTitle>
-                    <DialogDescription>Associe a categoria "{categoria.nome}" para os produtos disponíveis</DialogDescription>
+                    <DialogDescription>Associe a categoria "{categoria.name}" para os produtos disponíveis</DialogDescription>
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                     {/* MultiSelect para Fornecedores */}
                     <Controller
                         control={control}
-                        name="produtos"
+                        name="productsId"
                         render={({ field: { onChange, value } }) => {
 
                             return (
                                 <div>
                                     <MultiSelect
-                                        options={produtosLista}
+                                        options={produtosSelect}
                                         onValueChange={onChange}
                                         defaultValue={value || []}
                                         placeholder="Produtos"

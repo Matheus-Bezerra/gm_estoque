@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Categoria } from "@/interfaces";
+import { CategoriaApi } from "@/interfaces";
 
 interface DialogDeleteCategoriaProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    categoria: Categoria;
+    categoria: CategoriaApi;
 }
 
 export function DialogDeleteCategoria({ open, onClose, onConfirm, categoria }: DialogDeleteCategoriaProps) {
@@ -19,7 +19,7 @@ export function DialogDeleteCategoria({ open, onClose, onConfirm, categoria }: D
                 </DialogHeader>
                 
                 <p className="text-foreground">
-                    Tem certeza que deseja excluir a Categoria <span className="font-bold text-xl">"{categoria.nome}"</span>?
+                    Tem certeza que deseja excluir a Categoria <span className="font-bold text-xl">"{categoria.name}"</span>?
                 </p>
                 
                 <DialogFooter>

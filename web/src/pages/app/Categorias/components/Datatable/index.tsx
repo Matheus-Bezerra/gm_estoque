@@ -32,22 +32,23 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Categoria, objetoAssociado } from "@/interfaces"
+import { CategoriaApi, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteCategoria } from "../Dialogs/DialogDeleteCategoria"
 import { DialogEditCategoria } from "../Dialogs/DialogEditCategoria"
-import { produtosLista } from "@/utils/data/products/lista"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
 import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
 import { formCategoriaSchema } from "../../validators/formCategoriaSchema"
-import { categorias } from "@/utils/data/categorias"
 import { Badge } from "@/components/ui/badge"
+import { api } from "@/axios"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
-export const columns: ColumnDef<Categoria>[] = [
+export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -71,7 +72,7 @@ export const columns: ColumnDef<Categoria>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "nome",
+        accessorKey: "name",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -82,25 +83,25 @@ export const columns: ColumnDef<Categoria>[] = [
             </Button>
         ),
         cell: ({ row }) => <div className="capitalize">
-            <Badge className="rounded-3xl" style={{backgroundColor: row.getValue("cor") }}>{row.getValue("nome")}</Badge>
+            <Badge className="rounded-3xl" style={{ backgroundColor: row.getValue("color") }}>{row.getValue("name")}</Badge>
         </div>,
     },
     {
-        accessorKey: "cor",
+        accessorKey: "color",
         header: "Cor",
         cell: ({ row }) => <div className="capitalize flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: row.getValue("cor") }}></div>
-            {row.getValue("cor")}
+            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: row.getValue("color") }}></div>
+            {row.getValue("color")}
         </div>,
     },
     {
-        accessorKey: "produtosAssociados",
+        accessorKey: "products",
         header: "Produtos",
         cell: ({ row }) => {
-            const produtos = row.getValue("produtosAssociados") as objetoAssociado[]; // Asserção de tipo
+            const produtos = row.getValue("products") as ProdutoApi[];
             return (
                 <div>
-                    {produtos.map((produto) => produto.text).join(", ")}
+                    {produtos.map((produto) => produto.name).join(", ")}
                 </div>
             );
         },
@@ -109,48 +110,88 @@ export const columns: ColumnDef<Categoria>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
+            const queryClient = useQueryClient();
             const categoria = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openAssociarProdutos, setOpenAssociarProdutos] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
+            const editarCategoriaMutation = useMutation({
+                mutationFn: async (data: z.infer<typeof formCategoriaSchema>) => {
+                    const response = await api.put(`/category/${categoria.id}`, data);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["categories"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
+                    setOpenEdit(false)
+                    setOpenAssociarProdutos(false);
+
+                    toast({
+                        title: "Sucesso",
+                        description: "Categorias editada com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+
+                },
+                onError: (error) => {
+                    console.error("Erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao editar Categoria: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
             const handleEditSubmit: SubmitHandler<z.infer<typeof formCategoriaSchema>> = (data) => {
-                console.log(data);
-
-                setOpenEdit(false);
-
-                toast({
-                    title: "Sucesso",
-                    description: "Categoria Editado com sucesso!",
-                    duration: 4000,
-                    variant: "success"
-                });
+                editarCategoriaMutation.mutate(data)
             };
 
             const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
-                console.log("Dataaa ", data);
+                const dataEditCategory = {
+                    name: categoria.name,
+                    color: categoria.color,
+                    productsIds: data.productsId
+                }
+                editarCategoriaMutation.mutate(dataEditCategory)
 
-                setOpenAssociarProdutos(false);
-
-                toast({
-                    title: "Sucesso",
-                    description: "Produtos associados com sucesso",
-                    duration: 4000,
-                    variant: "success"
-                });
             };
 
-            const handleDeleteCategoria = () => {
-                console.log("Categoria deletado!", categoria)
-                setOpenDelete(false);
+            const deletarFornecedorMutation = useMutation({
+                mutationFn: async (categoriaId: string) => {
+                    const response = await api.delete(`/category/${categoriaId}`,);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["categories"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
 
-                toast({
-                    title: "Sucesso",
-                    description: "Categoria removido com sucesso!",
-                    duration: 4000,
-                    variant: "success"
-                });
+                    toast({
+                        title: "Sucesso",
+                        description: "Categoria remvoida com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+
+                    setOpenDelete(false);
+                },
+                onError: (error) => {
+                    console.error("erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao deletar Categoria: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
+            const handleDeleteCategoria = () => {
+                deletarFornecedorMutation.mutate(categoria.id)
             };
 
 
@@ -202,7 +243,6 @@ export const columns: ColumnDef<Categoria>[] = [
                         onSubmit={handleAssociarSubmit}
                     />
 
-                    {/* Modal de confirmação de exclusão */}
                     <DialogDeleteCategoria
                         open={openDelete}
                         onClose={() => setOpenDelete(false)}
@@ -225,11 +265,28 @@ export function DataTable() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
-    const data = categorias
+    const { data: categorias = [], isLoading, isError } = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const response = await api.get("/category")
+            return response.data
+        },
+    })
+
+    // Fetch de produtos associados
+    const { data: produtosAssociados = [] } = useQuery({
+        queryKey: ["associatedProducts"],
+        queryFn: async () => {
+            const response = await api.get("/product");
+            return response.data;
+        },
+    });
+
+
 
     const table = useReactTable({
-        data,
-        columns,
+        data: categorias,
+        columns: columns(produtosAssociados),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -246,14 +303,31 @@ export function DataTable() {
         },
     })
 
+    if (isLoading) {
+        return (
+            <div className="w-full">
+                <Skeleton className="h-10 w-full mb-4 mt-4" />
+                <Skeleton className="h-44 w-full" />
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="text-center text-red-500">
+                Erro ao carregar as categorias. Tente novamente mais tarde.
+            </div>
+        )
+    }
+
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Procurar categoria"
-                    value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("nome")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
