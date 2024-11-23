@@ -8,8 +8,6 @@ export const ProtectedRoute = () => {
     const { session, token, logout } = useSession();
     const { toast } = useToast()
 
-    console.log("Token ", token)
-
     useEffect(() => {
         if (token) {
             api.get('/auth/profile')

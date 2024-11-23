@@ -8,10 +8,10 @@ import { handlePesoInput } from "@/utils/validations/handlePesoInput";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Produto } from "@/interfaces";
+import { ProdutoApi } from "@/interfaces";
 
 interface DialogEditProdutoProps {
-    produto: Produto;
+    produto: ProdutoApi;
     onSubmit: SubmitHandler<ProdutoFormValues>;
     open: boolean;
     onClose: (open: boolean) => void;
@@ -33,22 +33,22 @@ export function DialogEditProduto({
     const { control, handleSubmit, setValue, formState: { errors } } = useForm<ProdutoFormValues>({
         resolver: zodResolver(formProdutoSchema),
         defaultValues: {
-            nome: produto.nome,
+            name: produto.name,
             status: produto.status,
-            tipoControle: produto.tipoControle,
-            peso: produto.peso,
-            quantidade: produto.quantidade,
-            fornecedor: produto.fornecedor?.id,
-            categoria: produto.categoria?.id,
+            typeControl: produto.typeControl,
+            amount: produto.amount,
+            quantity: produto.quantity,
+            supplierId: produto.supplierId,
+            categoryId: produto.categoryId
         },
     });
 
-    const [tipoControle, setTipoControle] = useState<"quantidade" | "peso">(produto.tipoControle);
+    const [tipoControle, setTipoControle] = useState<"UNIT" | "WEITGHT">(produto.typeControl);
 
-    const handleTipoControleChange = (value: "quantidade" | "peso") => {
+    const handleTipoControleChange = (value: "UNIT" | "WEITGHT") => {
         setTipoControle(value);
-        setValue("quantidade", undefined);
-        setValue("peso", undefined);
+        setValue("quantity", undefined);
+        setValue("amount", undefined);
     };
 
     return (
@@ -62,13 +62,13 @@ export function DialogEditProduto({
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
                                 <Input id="product-name" placeholder="Nome" {...field} />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>
                     <Controller
                         name="status"
@@ -79,17 +79,17 @@ export function DialogEditProduto({
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="ativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
-                                    <SelectItem value="inativo"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
+                                    <SelectItem value="ACTIVE"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo</SelectItem>
+                                    <SelectItem value="INACTIVE"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
                     />
                     <Controller
-                        name="tipoControle"
+                        name="typeControl"
                         control={control}
                         render={({ field }) => (
-                            <Select value={field.value} onValueChange={(value: "quantidade" | "peso") => {
+                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEITGHT") => {
                                 field.onChange(value);
                                 handleTipoControleChange(value);
                             }}>
@@ -97,23 +97,23 @@ export function DialogEditProduto({
                                     <SelectValue placeholder="Tipo de Controle" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
-                                    <SelectItem value="peso">Controle: Peso</SelectItem>
+                                    <SelectItem value="UNIT">Controle: Quantidade</SelectItem>
+                                    <SelectItem value="WEITGHT">Controle: Peso</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
                     />
                     {/* Renderização Condicional com Controller para Peso ou Quantidade */}
                     <Controller
-                        name={tipoControle === "peso" ? "peso" : "quantidade"}
+                        name={tipoControle === "WEITGHT" ? "amount" : "quantity"}
                         control={control}
                         rules={{
-                            required: tipoControle === "peso"
+                            required: tipoControle === "WEITGHT"
                                 ? "Peso é obrigatório."
                                 : "Quantidade é obrigatória."
                         }}
                         render={({ field, field: { value } }) => (
-                            tipoControle === "peso" ? (
+                            tipoControle === "WEITGHT" ? (
                                 <div>
                                     <Input
                                         {...field}
@@ -123,7 +123,7 @@ export function DialogEditProduto({
                                         onBeforeInput={handlePesoInput}
                                         value={value || ""}
                                     />
-                                    {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                                    {errors.typeControl && <span className="text-red-500">{errors.typeControl.message}</span>}
                                 </div>
                             ) : (
                                 <div>
@@ -134,7 +134,7 @@ export function DialogEditProduto({
                                         type="number"
                                         value={value || ""}
                                     />
-                                    {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                                    {errors.typeControl && <span className="text-red-500">{errors.typeControl.message}</span>}
                                 </div>
                             )
                         )}
@@ -142,11 +142,11 @@ export function DialogEditProduto({
                     {/* Select para Fornecedores */}
                     <Controller
                         control={control}
-                        name="fornecedor"
+                        name="supplierId"
                         render={({ field: { onChange, value } }) => (
                             <Select
                                 onValueChange={onChange}
-                                defaultValue={value}
+                                defaultValue={value ? value : ''}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Fornecedor" />
@@ -164,12 +164,12 @@ export function DialogEditProduto({
                     {/* Select para Categorias */}
                     <Controller
                         control={control}
-                        name="categoria"
+                        name="categoryId"
                         render={({ field: { onChange, value } }) => {
                             return (
                                 <Select
                                     onValueChange={onChange}
-                                    defaultValue={value}
+                                    defaultValue={value ? value : ''}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Categoria" />

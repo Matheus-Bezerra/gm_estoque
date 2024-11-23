@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Produto } from "@/interfaces";
+import { ProdutoApi } from "@/interfaces";
 
 interface DialogDeleteProdutoProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    produto: Produto;
+    produto: ProdutoApi;
 }
 
 export function DialogDeleteProduto({ open, onClose, onConfirm, produto }: DialogDeleteProdutoProps) {
@@ -19,7 +19,7 @@ export function DialogDeleteProduto({ open, onClose, onConfirm, produto }: Dialo
                 </DialogHeader>
                 
                 <p className="text-foreground">
-                    Tem certeza que deseja excluir o produto <span className="font-bold text-xl">"{produto.nome}"</span>?
+                    Tem certeza que deseja excluir o produto <span className="font-bold text-xl">"{produto.name}"</span>?
                 </p>
                 
                 <DialogFooter>

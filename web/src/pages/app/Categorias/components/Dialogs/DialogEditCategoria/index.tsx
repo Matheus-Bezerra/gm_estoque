@@ -49,8 +49,8 @@ export function DialogEditCategoria({
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Editar Fornecedor</DialogTitle>
-                    <DialogDescription>Altere os detalhes do fornecedor abaixo</DialogDescription>
+                    <DialogTitle>Editar Categoria</DialogTitle>
+                    <DialogDescription>Altere os detalhes da categoria abaixo</DialogDescription>
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>

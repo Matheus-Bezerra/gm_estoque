@@ -27,3 +27,18 @@ export interface Produto {
     categoria?: Categoria | null
     criado: Date
 }
+
+export interface ProdutoApi {
+    id: string
+    name: string
+    typeControl: "UNIT" |  "WEITGHT"
+    quantity?: number 
+    amount?: number
+    status: "ACTIVE" | "INACTIVE"
+    supplierId?: string
+    categoryId?: string
+    createAt: Date
+    updateAt: Date
+    userId: string
+}
+

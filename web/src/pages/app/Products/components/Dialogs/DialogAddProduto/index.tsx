@@ -3,7 +3,6 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema";
-import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,29 +20,22 @@ interface DialogAddProdutoProps {
 
 export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedoresLista, categoriasLista, onSubmit, isDialogAddProdutoOpen, setDialogAddProdutoOpen }) => {
     const [addTipoControle, setAddTipoControle] = useState("quantidade");
-    const { toast } = useToast();
 
     const { handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formProdutoSchema>>({
         resolver: zodResolver(formProdutoSchema),
         defaultValues: {
-            nome: "",
-            status: "ativo",
-            tipoControle: "quantidade",
-            peso: "",
-            quantidade: "",
-            fornecedor: "",
-            categoria: ""
+            name: "",
+            status: "ACTIVE",
+            typeControl: "UNIT",
+            amount: "",
+            quantity: "",
+            supplierId: "",
+            categoryId: ""
         }
     });
 
     const handleFormSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
         onSubmit(data);
-        toast({
-            title: "Sucesso",
-            description: "Produto adicionado com sucesso!",
-            duration: 4000,
-            variant: "success"
-        });
     };
 
     return (
@@ -61,13 +53,13 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                 <form className="grid gap-4" onSubmit={handleSubmit(handleFormSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
                                 <Input {...field} placeholder="Nome" />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>
 
                     <Controller
@@ -79,10 +71,10 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="ativo">
+                                    <SelectItem value="ACTIVE">
                                         <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-green-400"></span> Ativo
                                     </SelectItem>
-                                    <SelectItem value="inativo">
+                                    <SelectItem value="INACTIVE">
                                         <span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-red-400"></span> Inativo
                                     </SelectItem>
                                 </SelectContent>
@@ -91,10 +83,10 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                     />
 
                     <Controller
-                        name="tipoControle"
+                        name="typeControl"
                         control={control}
                         render={({ field }) => (
-                            <Select {...field} onValueChange={(value) => {
+                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEITGHT") => {
                                 field.onChange(value);
                                 setAddTipoControle(value);
                             }}>
@@ -102,17 +94,17 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                     <SelectValue placeholder="Tipo de Controle" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="quantidade">Controle: Quantidade</SelectItem>
-                                    <SelectItem value="peso">Controle: Peso</SelectItem>
+                                    <SelectItem value="UNIT">Controle: Quantidade</SelectItem>
+                                    <SelectItem value="WEITGHT">Controle: Peso</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
                     />
 
-                    {addTipoControle === "peso" ? (
+                    {addTipoControle === "WEITGHT" ? (
                         <div>
                             <Controller
-                                name="peso"
+                                name="amount"
                                 control={control}
                                 render={({ field }) => (
                                     <Input
@@ -124,12 +116,12 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                     />
                                 )}
                             />
-                            {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                            {errors.typeControl && <span className="text-red-500">{errors.typeControl.message}</span>}
                         </div>
                     ) : (
                         <div>
                             <Controller
-                                name="quantidade"
+                                name="quantity"
                                 control={control}
                                 render={({ field }) => (
                                     <Input
@@ -140,12 +132,12 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                     />
                                 )}
                             />
-                            {errors.tipoControle && <span className="text-red-500">{errors.tipoControle.message}</span>}
+                            {errors.typeControl && <span className="text-red-500">{errors.typeControl.message}</span>}
                         </div>
                     )}
 
                     <Controller
-                        name="fornecedor"
+                        name="supplierId"
                         control={control}
                         render={({ field: { onChange } }) => (
                             <Select
@@ -165,7 +157,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                     />
 
                     <Controller
-                        name="categoria"
+                        name="categoryId"
                         control={control}
                         render={({ field: { onChange } }) => {
                             return (

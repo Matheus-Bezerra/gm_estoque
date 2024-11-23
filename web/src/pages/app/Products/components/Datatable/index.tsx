@@ -32,23 +32,22 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Categoria, Fornecedor, Produto } from "@/interfaces"
+import { Categoria, Fornecedor, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
-import { produtos } from "@/utils/data/products"
 import { fornecedoresLista } from "@/utils/data/fornecedores/lista"
 import { categoriasLista } from "@/utils/data/categorias/lista"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
-import {SubmitHandler } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 import { DialogDeleteProduto } from "@/pages/app/Products/components/Dialogs/DialogDeleteProduto"
 import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/DialogEditProduto"
 import { api } from "@/axios"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 
 
-export const columns: ColumnDef<Produto>[] = [
+export const columns: ColumnDef<ProdutoApi>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -72,7 +71,7 @@ export const columns: ColumnDef<Produto>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "nome",
+        accessorKey: "name",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -82,56 +81,56 @@ export const columns: ColumnDef<Produto>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
     },
     {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-            <div className="capitalize"><span className={`inline-block w-2.5 h-2.5 rounded-full mr-2 ${row.getValue('status') == 'ativo' ? 'bg-green-400' : 'bg-red-400'}`}></span>{row.getValue("status")}</div>
+            <div className="capitalize"><span className={`inline-block w-2.5 h-2.5 rounded-full mr-2 ${row.getValue('status') == 'ACTIVE' ? 'bg-green-400' : 'bg-red-400'}`}></span>{row.getValue("status") == 'ACTIVE' ? 'Ativo' : 'Inativo'}</div>
         ),
     },
     {
-        accessorKey: "tipoControle",
+        accessorKey: "typeControl",
         header: "Tipo de Controle",
-        cell: ({ row }) => <div>{row.getValue("tipoControle") === "quantidade" ? "Quantidade" : "Peso"}</div>,
+        cell: ({ row }) => <div>{row.getValue("typeControl") === "UNIT" ? "Quantidade" : "Peso"}</div>,
     },
     {
-        accessorKey: "quantidade",
+        accessorKey: "quantity",
         header: () => <div>Quantidade</div>,
         cell: ({ row }) => (
-            <div>{row.getValue("quantidade") || "-"}</div>
+            <div>{row.getValue("quantity") || "-"}</div>
         ),
         enableSorting: true,
     },
     {
-        accessorKey: "peso",
+        accessorKey: "amount",
         header: () => <div>Peso</div>,
         cell: ({ row }) => (
-            <div>{row.getValue("peso") || "-"}</div>
+            <div>{row.getValue("amount") || "-"}</div>
         ),
         enableSorting: true,
     },
     {
-        accessorKey: "fornecedor",
+        accessorKey: "supplierId",
         header: "Fornecedor",
         cell: ({ row }) => {
-            const fornecedores = row.getValue("fornecedor") as Fornecedor; // Asserção de tipo
+            const fornecedores = row.getValue("supplierId") as Fornecedor; // Asserção de tipo
             return (
                 <div>
-                    {fornecedores.nome}
+                    -
                 </div>
             );
         },
     },
     {
-        accessorKey: "categoria",
+        accessorKey: "categoryId",
         header: "Categoria",
         cell: ({ row }) => {
-            const categoria = row.getValue("categoria") as Categoria; // Asserção de tipo
+            const categoria = row.getValue("categoryId") as Categoria; // Asserção de tipo
             return (
                 <div>
-                    {categoria.nome}
+                    {"-"}
                 </div>
             );
         },
@@ -140,34 +139,76 @@ export const columns: ColumnDef<Produto>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
+            const queryClient = useQueryClient();
             const produto = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
+            const editarProdutoMutation = useMutation({
+                mutationFn: async (data: z.infer<typeof formProdutoSchema>) => {
+                    const response = await api.post("/product", data);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["products"] });
+        
+                    toast({
+                        title: "Sucesso",
+                        description: "Produto editado com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+        
+                    setOpenEdit(false)
+                },
+                onError: (error) => {
+                    console.error("Erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao editar produto: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
             const handleEditSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
-                console.log(data);
-
-                setOpenEdit(false);
-
-                toast({
-                    title: "Sucesso",
-                    description: "Produto Editado com sucesso!",
-                    duration: 5000,
-                    variant: "success"
-                });
+                editarProdutoMutation.mutate(data)
             };
 
-            const handleDeleteProduto = () => {
-                console.log("Produto deletado!", produto)
-                setOpenDelete(false); 
+            // Mutação para deletar o produto
+            const deletarProdutoMutation = useMutation({
+                mutationFn: async (produtoId: string) => {
+                    const response = await api.delete(`/product/${produtoId}`,);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["products"] });
 
-                toast({
-                    title: "Sucesso",
-                    description: "Produto removido com sucesso!",
-                    duration: 5000,
-                    variant: "success"
-                });
+                    toast({
+                        title: "Sucesso",
+                        description: "Produto remvoido com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+
+                    setOpenDelete(false);
+                },
+                onError: (error) => {
+                    console.error("erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao deletar produto: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
+
+            const handleDeleteProduto = () => {
+                deletarProdutoMutation.mutate(produto.id);
             };
 
 
@@ -203,8 +244,8 @@ export const columns: ColumnDef<Produto>[] = [
                         open={openEdit}
                         onClose={() => setOpenEdit(false)}
                         onSubmit={handleEditSubmit}
-                        fornecedoresLista={fornecedoresLista}  
-                        categoriasLista={categoriasLista}  
+                        fornecedoresLista={fornecedoresLista}
+                        categoriasLista={categoriasLista}
                     />
 
                     {/* Modal de confirmação de exclusão */}
@@ -227,14 +268,13 @@ export function DataTable() {
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
 
-    // Buscar os produtos da API usando a nova versão do useQuery
     const { data: produtos = [], isLoading, isError } = useQuery({
         queryKey: ["products"],
         queryFn: async () => {
             const response = await api.get("/product")
 
             console.log("Responseee ", response)
-            return []
+            return response.data
         },
     })
 
@@ -279,9 +319,9 @@ export function DataTable() {
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Procurar produto"
-                    value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("nome")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
