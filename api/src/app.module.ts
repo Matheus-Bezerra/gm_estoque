@@ -6,8 +6,6 @@ import { ProductModule } from './modules/products/product.module';
 import { SupplierModule } from './modules/suppliers/supplier.module';
 import { UserModule } from './modules/user/user.module';
 
-
-
 @Module({
   imports: [ProductModule, SupplierModule, CategoryModule, UserModule, AuthModule],
   controllers: [],
