@@ -64,6 +64,7 @@ model Supplier {
 model Category {
   id       String    @id @default(uuid())
   name     String
+  color    String
   createAt DateTime  @default(now())
   updateAt DateTime  @default(now()) @updatedAt
   products Product[]

@@ -11,11 +11,19 @@ export class CategoryService {
 
 
     async createCategory(userId: string, category: CategoryCreateInput): Promise<Category> {
-        category.user = { connect: { id: userId } };
-        category.products = { connect: category?.productsIds?.map(id => ({ id })) };
-        return await this.prisma.category.create({
-            data: category
-        });
+
+        let categoryCreated: Prisma.CategoryCreateArgs = {
+            data: {
+                name: category.name,
+                color: category.color,
+                user: { connect: { id: userId } }
+            }, include: { products: true }
+        }
+
+        if (category.productsIds && category.productsIds.length > 0)
+            categoryCreated.data.products = { connect: category.productsIds.map(id => ({ id })) };
+
+        return await this.prisma.category.create(categoryCreated);
     }
 
     async getAllCategorys(userId): Promise<Category[]> {
@@ -23,7 +31,7 @@ export class CategoryService {
             {
                 where: { user: { id: userId } },
                 include: { products: true },
-                orderBy: { updateAt: 'asc' }
+                orderBy: { name: 'asc' }
             }
         );
     }

@@ -1,18 +1,19 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Request, BadRequestException } from '@nestjs/common';
 import { Prisma, TypeControl } from '@prisma/client';
 import { ProductService } from './product.service';
+import { ProductCreateInput, ProductGetAllInput } from './domain/products.interface';
 
 @Controller('product')
 export class ProductController {
     constructor(private readonly productService: ProductService) { }
 
     @Get()
-    async getAllProducts(@Request() req) {
-        return await this.productService.getAllProducts(req.user.id);
+    async getAllProducts(@Request() req, @Body() input?: ProductGetAllInput) {
+        return await this.productService.getAllProducts(req.user.id, input);
     }
 
     @Post()
-    async createProduct(@Request() req, @Body() product: Prisma.ProductCreateInput) {
+    async createProduct(@Request() req, @Body() product: ProductCreateInput) {
         this.validateProduct(product);
         return await this.productService.createProduct(req.user.id, product);
     }
