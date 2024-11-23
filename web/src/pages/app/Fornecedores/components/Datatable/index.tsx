@@ -34,17 +34,18 @@ import {
 } from "@/components/ui/table"
 import { FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteFornecedor } from "../Dialogs/DialogDeleteFornecedor"
 import { DialogEditFornecedor } from "../Dialogs/DialogEditFornecedor"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
-import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
+import { formAssociarProdutosSchema } from "@/utils/validators/formAssociarProdutosSchema"
 import { formFornecedorSchema } from "../../validators/formFornecedorSchema"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { api } from "@/axios"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEditSupplierMutation } from "../../mutations/useEditSupplier"
+import { useDeleteSupplierMutation } from "../../mutations/useDeleteSupplier"
 
 
 export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[] => [
@@ -104,84 +105,26 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const queryClient = useQueryClient();
             const fornecedor = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openAssociarProdutos, setOpenAssociarProdutos] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
-            const { toast } = useToast()
-
-            const editarProdutoMutation = useMutation({
-                mutationFn: async (data: z.infer<typeof formFornecedorSchema>) => {
-                    const response = await api.put(`/supplier/${fornecedor.id}`, data);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Fornecedor editado com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                    setOpenEdit(false)
-                    setOpenAssociarProdutos(false)
-                },
-                onError: (error) => {
-                    console.error("Erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao editar Fornecedor: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
+            const editarFornecedorMutation = useEditSupplierMutation(setOpenEdit, setOpenAssociarProdutos);
+            const deletarFornecedorMutation = useDeleteSupplierMutation(setOpenDelete);
 
             const handleEditSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
-                editarProdutoMutation.mutate(data)
+                editarFornecedorMutation.mutate({ id: fornecedor.id, ...data });
             };
 
             const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
                 const dataEdiSupplier = {
+                    id: fornecedor.id,
                     name: fornecedor.name,
                     email: fornecedor.email,
                     productsIds: data.productsId
                 }
-              editarProdutoMutation.mutate(dataEdiSupplier)
+                editarFornecedorMutation.mutate(dataEdiSupplier)
             };
-
-            const deletarFornecedorMutation = useMutation({
-                mutationFn: async (fornecedorId: string) => {
-                    const response = await api.delete(`/supplier/${fornecedorId}`,);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Fornecedor remvoido com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                    setOpenDelete(false);
-                },
-                onError: (error) => {
-                    console.error("erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao deletar Fornecedor: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
 
             const handleDeleteFornecedor = () => {
                 deletarFornecedorMutation.mutate(fornecedor.id)

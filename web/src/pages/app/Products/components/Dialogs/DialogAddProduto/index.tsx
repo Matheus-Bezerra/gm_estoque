@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { handlePesoInput } from "@/utils/validations/handlePesoInput";
+import { handlePesoInput } from "@/utils/validators/handlePesoInput";
 import { CategoriaApi, FornecedorAPI } from "@/interfaces";
 
 

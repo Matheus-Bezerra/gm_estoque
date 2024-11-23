@@ -34,18 +34,19 @@ import {
 } from "@/components/ui/table"
 import { CategoriaApi, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteCategoria } from "../Dialogs/DialogDeleteCategoria"
 import { DialogEditCategoria } from "../Dialogs/DialogEditCategoria"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
-import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
+import { formAssociarProdutosSchema } from "@/utils/validators/formAssociarProdutosSchema"
 import { formCategoriaSchema } from "../../validators/formCategoriaSchema"
 import { Badge } from "@/components/ui/badge"
 import { api } from "@/axios"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEditCategoryMutation } from "../../mutations/useEditCategory"
+import { useDeleteCategoryMutation } from "../../mutations/useDeleteCategory"
 
 
 export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] => [
@@ -110,88 +111,30 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] 
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const queryClient = useQueryClient();
             const categoria = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openAssociarProdutos, setOpenAssociarProdutos] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
-            const { toast } = useToast()
-
-            const editarCategoriaMutation = useMutation({
-                mutationFn: async (data: z.infer<typeof formCategoriaSchema>) => {
-                    const response = await api.put(`/category/${categoria.id}`, data);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["categories"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
-                    setOpenEdit(false)
-                    setOpenAssociarProdutos(false);
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Categorias editada com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                },
-                onError: (error) => {
-                    console.error("Erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao editar Categoria: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
+            const editarCategoriaMutation = useEditCategoryMutation(setOpenEdit, setOpenAssociarProdutos);
+            const deletarCategoriaMutation = useDeleteCategoryMutation(setOpenDelete);
 
             const handleEditSubmit: SubmitHandler<z.infer<typeof formCategoriaSchema>> = (data) => {
-                editarCategoriaMutation.mutate(data)
+                editarCategoriaMutation.mutate({ id: categoria.id, ...data });
             };
 
             const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
                 const dataEditCategory = {
+                    id: categoria.id,
                     name: categoria.name,
                     color: categoria.color,
-                    productsIds: data.productsId
-                }
-                editarCategoriaMutation.mutate(dataEditCategory)
+                    productsIds: data.productsId,
+                };
+                editarCategoriaMutation.mutate(dataEditCategory);
 
             };
 
-            const deletarFornecedorMutation = useMutation({
-                mutationFn: async (categoriaId: string) => {
-                    const response = await api.delete(`/category/${categoriaId}`,);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["categories"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Categoria remvoida com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                    setOpenDelete(false);
-                },
-                onError: (error) => {
-                    console.error("erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao deletar Categoria: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
-
             const handleDeleteCategoria = () => {
-                deletarFornecedorMutation.mutate(categoria.id)
+                deletarCategoriaMutation.mutate(categoria.id)
             };
 
 

@@ -4,7 +4,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
+import { formAssociarProdutosSchema } from "@/utils/validators/formAssociarProdutosSchema";
 import { CategoriaApi, ProdutoApi } from "@/interfaces";
 
 interface DialogAssociarProdutos {

@@ -34,16 +34,17 @@ import {
 } from "@/components/ui/table"
 import { CategoriaApi, FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 import { DialogDeleteProduto } from "@/pages/app/Products/components/Dialogs/DialogDeleteProduto"
 import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/DialogEditProduto"
 import { api } from "@/axios"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {  useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
+import { useEditProductMutation } from "../../mutations/useEditProduct"
+import { useDeleteProductMutation } from "../../mutations/useDeleteProduct"
 
 
 export const columns = (fornecedoresLista: FornecedorAPI[], categoriasLista: CategoriaApi[]): ColumnDef<ProdutoApi>[] => [
@@ -167,94 +168,16 @@ export const columns = (fornecedoresLista: FornecedorAPI[], categoriasLista: Cat
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const queryClient = useQueryClient();
             const produto = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
-            const { toast } = useToast()
-
-            const editarProdutoMutation = useMutation({
-                mutationFn: async (data: z.infer<typeof formProdutoSchema>) => {
-                    if (data.typeControl == 'UNIT') {
-                        delete data.amount
-                        if (data.quantity && typeof data.quantity === 'string') {
-                            data.quantity = parseInt(data.quantity, 10);
-                        }
-                    } else if (data.typeControl == 'WEITGHT') {
-                        delete data.quantity
-                        if (typeof data.amount === 'string') {
-                            data.amount = parseFloat(data.amount.replace(',', '.'));
-                        }
-                    }
-                    if (!data.supplierId) {
-                        delete data.supplierId
-                    }
-                    if (!data.categoryId) {
-                        delete data.categoryId
-                    }
-
-                    const response = await api.put(`/product/${produto.id}`, data);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["products"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Produto editado com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                    setOpenEdit(false)
-                },
-                onError: (error) => {
-                    console.error("Erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao editar produto: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
+            const editarProdutoMutation = useEditProductMutation(setOpenEdit);
+            const deletarProdutoMutation = useDeleteProductMutation(setOpenDelete);
+          
 
             const handleEditSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
-                editarProdutoMutation.mutate(data)
+                editarProdutoMutation.mutate({id:produto.id, ...data})
             };
-
-            const deletarProdutoMutation = useMutation({
-                mutationFn: async (produtoId: string) => {
-                    const response = await api.delete(`/product/${produtoId}`,);
-                    return response.data;
-                },
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["products"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
-                    queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
-
-                    toast({
-                        title: "Sucesso",
-                        description: "Produto remvoido com sucesso!",
-                        duration: 2000,
-                        variant: "success",
-                    });
-
-                    setOpenDelete(false);
-                },
-                onError: (error) => {
-                    console.error("erro ", error)
-                    toast({
-                        title: "Erro",
-                        description: `Erro ao deletar produto: ${error.message}`,
-                        duration: 2000,
-                        variant: "destructive",
-                    });
-                },
-            });
-
 
             const handleDeleteProduto = () => {
                 deletarProdutoMutation.mutate(produto.id);

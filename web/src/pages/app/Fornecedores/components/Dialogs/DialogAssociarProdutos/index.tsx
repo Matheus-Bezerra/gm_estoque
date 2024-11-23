@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FornecedorAPI, ProdutoApi } from "@/interfaces";
-import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
+import { formAssociarProdutosSchema } from "@/utils/validators/formAssociarProdutosSchema";
 
 interface DialogAssociarProdutos {
     fornecedor: FornecedorAPI;

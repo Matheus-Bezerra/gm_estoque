@@ -1,69 +1,17 @@
 import { Helmet } from "react-helmet-async";
 import { DataTable } from "./components/Datatable";
-import { useToast } from "@/hooks/use-toast";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod"
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 import { DialogAddProduto } from "./components/Dialogs/DialogAddProduto";
 import { useState } from "react";
 import { api } from "@/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-
+import { useQuery } from "@tanstack/react-query";
+import { useCreateProductMutation } from "./mutations/useCreateProduct";
 
 export const Products = () => {
-    const { toast } = useToast()
     const [isDialogAdd, setIsDialogAdd] = useState(false)
-    const queryClient = useQueryClient();
-
-    // Mutação para criar o produto
-    const criarProdutoMutation = useMutation({
-        mutationFn: async (data: z.infer<typeof formProdutoSchema>) => {
-            if (data.typeControl == 'UNIT') {
-                delete data.amount
-                if (data.quantity && typeof data.quantity === 'string') {
-                    data.quantity = parseInt(data.quantity, 10);
-                }
-            } else if (data.typeControl == 'WEITGHT') {
-                delete data.quantity
-                if (typeof data.amount === 'string') {
-                    data.amount = parseFloat(data.amount.replace(',', '.'));
-                }
-            }
-            if(!data.supplierId) {
-                delete data.supplierId
-            }
-            if(!data.categoryId) {
-                delete data.categoryId
-            }
-
-            const response = await api.post("/product", data);
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
-            queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
-
-            toast({
-                title: "Sucesso",
-                description: "Produto adicionado com sucesso!",
-                duration: 2000,
-                variant: "success",
-            });
-
-            setIsDialogAdd(false)
-        },
-        onError: (error) => {
-            console.error("Erro ", error)
-            toast({
-                title: "Erro",
-                description: `Erro ao adicionar produto: ${error.message}`,
-                duration: 2000,
-                variant: "destructive",
-            });
-        },
-    });
+    const criarProdutoMutation = useCreateProductMutation(setIsDialogAdd);
 
     const addProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
         criarProdutoMutation.mutate(data)
