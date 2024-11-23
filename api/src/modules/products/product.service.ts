@@ -41,15 +41,12 @@ export class ProductService {
             orderBy: { updateAt: 'desc' }
         }
 
-        if(input?.filters) {
+        if(input?.productsWithoutSupplier) {
+            args.where = { ...args.where, supplierId: null }
+        }
 
-            if(input.filters.productsWithoutSupplier) {
-                args.where = { ...args.where, supplierId: null }
-            }
-
-            if(input.filters.productsWithoutCategory) {
-                args.where = { ...args.where, categoryId: null }
-            }
+        if(input?.productsWithoutCategory) {
+            args.where = { ...args.where, categoryId: null }
         }
 
         return await this.prisma.product.findMany(args);

@@ -1,12 +1,8 @@
 import { Prisma } from "@prisma/client";
 
-export interface Filters {
-    productsWithoutCategory?: boolean;
-    productsWithoutSupplier?: boolean;
-}
-
 export interface ProductGetAllInput {
-    filters?: Filters;    
+    productsWithoutCategory?: boolean;
+    productsWithoutSupplier?: boolean;    
 }
 
 export interface ProductCreateInput extends Prisma.ProductCreateInput {
