@@ -7,8 +7,37 @@ import { ArrowUpRight, Boxes, Tag, Upload, Users } from "lucide-react"
 import { Helmet } from "react-helmet-async"
 import { Link } from "react-router-dom"
 import CardInfo from "@/pages/app/Home/components/CardInfo/index"
+import { useQuery } from "@tanstack/react-query"
+import { api } from "@/axios"
+import { CategoriaApi, FornecedorAPI, ProdutoApi } from "@/interfaces"
 
 export const Home = () => {
+    const { data: produtos = [], isLoading: isLoadingProdutos = true } = useQuery<ProdutoApi[]>({
+        queryKey: ["products"],
+        queryFn: async () => {
+            const response = await api.get("/product")
+            return response.data
+        },
+    })
+
+    const { data: fornecedores = [], isLoading: isLoadingFornecedores = true } = useQuery<FornecedorAPI[]>({
+        queryKey: ["suppliers"],
+        queryFn: async () => {
+            const response = await api.get("/supplier")
+            return response.data
+        },
+    })
+
+    const { data: categorias = [], isLoading: isLoadingCategorias = true } = useQuery<CategoriaApi[]>({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const response = await api.get("/category")
+            return response.data
+        },
+    })
+
+    const quantidadeProdutosAtivos = produtos.filter(produto => produto.status === 'ACTIVE').length;
+
     return (
         <>
             <Helmet title="Inicial" />
@@ -16,31 +45,35 @@ export const Home = () => {
                 <div className="grid grid-cols-4 gap-3">
                     <CardInfo
                         title="Produtos cadastrados"
-                        value={48}
+                        value={produtos.length}
                         linkText="produtos"
                         linkUrl="/produtos"
                         Icon={Boxes} // Usando o ícone do Lucide
+                        isLoading={isLoadingProdutos}
                     />
                     <CardInfo
-                        title="Produtos zerados"
-                        value={3}
+                        title="Produtos ativos"
+                        value={quantidadeProdutosAtivos}
                         linkText="produtos"
                         linkUrl="/produtos"
                         Icon={Upload}
+                        isLoading={isLoadingProdutos}
                     />
                     <CardInfo
                         title="Total de Fornecedores"
-                        value={12}
+                        value={fornecedores.length}
                         linkText="Fornecedores"
                         linkUrl="/fornecedores"
                         Icon={Users}
+                        isLoading={isLoadingFornecedores}
                     />
                     <CardInfo
                         title="Total de Categorias"
-                        value={24}
+                        value={categorias.length}
                         linkText="Categorias"
                         linkUrl="/categorias"
                         Icon={Tag}
+                        isLoading={isLoadingCategorias}
                     />
                 </div>
 
@@ -53,7 +86,7 @@ export const Home = () => {
                             <div className="grid gap-2">
                                 <CardTitle>Produtos</CardTitle>
                                 <CardDescription>
-                                    Os produtos mais recentes adicionados ao seu estoque
+                                    Os produtos mais recentes alterados no seu estoque
                                 </CardDescription>
                             </div>
                             <Button asChild size="sm" className="ml-auto gap-1">
@@ -64,79 +97,34 @@ export const Home = () => {
                             </Button>
                         </CardHeader>
                         <CardContent>
-
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Nome</TableHead>
-                                        <TableHead className="text-right">Estoque</TableHead>
+                                        <TableHead className="text-right">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">Hambúrgueres</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Comida
-                                                </Badge>
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Fast Food
-                                                </Badge>
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Principais
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">14</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">Arroz</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Comida
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">10</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">Filé de Frango</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Mistura
-                                                </Badge>
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Fritura
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">9</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">Sobrecoxa</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Assado
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">7</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">Pacote petiscos</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none">
-                                                    Aperitivo
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">5</TableCell>
-                                    </TableRow>
+                                    {produtos.length > 0 && produtos.slice(0, 5).map(produto => (
+                                        <TableRow>
+                                            <TableCell>
+                                                <div className="font-medium">{produto.name}</div>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    {produto.category && (
+                                                        <Badge
+                                                            className="hidden md:inline-block rounded-3xl px-3 text-xs leading-none"
+                                                            style={{ backgroundColor: produto.category.color }}
+                                                        >
+                                                            {produto.category.name}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <span className={`inline-block w-2.5 h-2.5 rounded-full mr-2 ${produto.status == 'ACTIVE' ? 'bg-green-400' : 'bg-red-400'}`}></span>{produto.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -149,81 +137,38 @@ export const Home = () => {
                             </div>
                         </CardHeader>
                         <CardContent className="grid gap-8">
-                            <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                                    <AvatarFallback>OM</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        Olivia Martin
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        olivia.martin@email.com
-                                    </p>
-                                </div>
-                                <div className="ml-auto font-medium">13</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/02.png" alt="Avatar" />
-                                    <AvatarFallback>JL</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        Jackson Lee
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        jackson.lee@email.com
-                                    </p>
-                                </div>
-                                <div className="ml-auto font-medium">11</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/03.png" alt="Avatar" />
-                                    <AvatarFallback>IN</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        Isabella Nguyen
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        isabella.nguyen@email.com
-                                    </p>
-                                </div>
-                                <div className="ml-auto font-medium">9</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/04.png" alt="Avatar" />
-                                    <AvatarFallback>WK</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        William Kim
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        will@email.com
-                                    </p>
-                                </div>
-                                <div className="ml-auto font-medium">6</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/05.png" alt="Avatar" />
-                                    <AvatarFallback>SD</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        Sofia Davis
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        sofia.davis@email.com
-                                    </p>
-                                </div>
-                                <div className="ml-auto font-medium">4</div>
-                            </div>
+                            {
+                                fornecedores.length > 0 && fornecedores.slice(0, 5).map(fornecedor => (
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="hidden h-9 w-9 sm:flex">
+                                            <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                                            <AvatarFallback>
+                                                {
+                                                    (() => {
+                                                        const nameParts = fornecedor.name.split(" ");
+                                                        if (nameParts.length > 1) {
+                                                            // Se tiver Sobrenome
+                                                            return `${nameParts[0][0].toUpperCase()}${nameParts[nameParts.length - 1][0].toUpperCase()}`;
+                                                        } else {
+                                                            // Se não tiver Sobrenome, Pega as duas primeiras letras do nome
+                                                            return `${nameParts[0][0].toUpperCase()}${nameParts[0][1]?.toUpperCase() || ""}`;
+                                                        }
+                                                    })()
+                                                }
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="grid gap-1">
+                                            <p className="text-sm font-medium leading-none">
+                                                {fornecedor.name}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {fornecedor.email}
+                                            </p>
+                                        </div>
+                                        <div className="ml-auto font-medium">{fornecedor.products.length}</div>
+                                    </div>
+                                ))
+                            }
                         </CardContent>
                     </Card>
                 </div>
