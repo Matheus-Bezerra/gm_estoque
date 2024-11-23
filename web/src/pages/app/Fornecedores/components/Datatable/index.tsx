@@ -32,7 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Fornecedor, objetoAssociado } from "@/interfaces"
+import { Fornecedor, objetoAssociado, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
@@ -44,6 +44,9 @@ import { fornecedores } from "@/utils/data/fornecedores"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
 import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
 import { formFornecedorSchema } from "../../validators/formFornecedorSchema"
+import { useQuery } from "@tanstack/react-query"
+import { api } from "@/axios"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export const columns: ColumnDef<Fornecedor>[] = [
@@ -70,7 +73,7 @@ export const columns: ColumnDef<Fornecedor>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "nome",
+        accessorKey: "name",
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -80,7 +83,7 @@ export const columns: ColumnDef<Fornecedor>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
     },
     {
         accessorKey: "email",
@@ -88,13 +91,13 @@ export const columns: ColumnDef<Fornecedor>[] = [
         cell: ({ row }) => <div className="capitalize">{row.getValue("email")}</div>,
     },
     {
-        accessorKey: "produtosAssociados",
+        accessorKey: "products",
         header: "Produtos",
         cell: ({ row }) => {
-            const produtos = row.getValue("produtosAssociados") as objetoAssociado[]; // Asserção de tipo
+            const produtos = row.getValue("products") as ProdutoApi[]; // Asserção de tipo
             return (
                 <div>
-                    {produtos.map((produto) => produto.text).join(", ")}
+                    {produtos.map((produto) => produto.name).join(", ")}
                 </div>
             );
         },
@@ -219,10 +222,17 @@ export function DataTable() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
-    const data = fornecedores
+    const { data: fornecedores = [], isLoading, isError } = useQuery({
+        queryKey: ["suppliers"],
+        queryFn: async () => {
+            const response = await api.get("/supplier")
+            return response.data
+        },
+    })
+
 
     const table = useReactTable({
-        data,
+        data: fornecedores,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -239,6 +249,23 @@ export function DataTable() {
             rowSelection,
         },
     })
+
+    if (isLoading) {
+        return (
+            <div className="w-full">
+                <Skeleton className="h-10 w-full mb-4 mt-4" />
+                <Skeleton className="h-44 w-full" />
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="text-center text-red-500">
+                Erro ao carregar os produtos. Tente novamente mais tarde.
+            </div>
+        )
+    }
 
     return (
         <div className="w-full">

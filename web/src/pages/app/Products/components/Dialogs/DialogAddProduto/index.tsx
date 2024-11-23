@@ -17,25 +17,31 @@ interface DialogAddProdutoProps {
     isDialogAddProdutoOpen: boolean;
     setDialogAddProdutoOpen: (isOpen: boolean) => void;
 }
+const valoresPadraoAdicionarProduto: z.infer<typeof formProdutoSchema> = {
+    name: "",
+    status: "ACTIVE",
+    typeControl: "UNIT",
+    amount: "",
+    quantity: "",
+    supplierId: "",
+    categoryId: ""
+}
 
 export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedoresLista, categoriasLista, onSubmit, isDialogAddProdutoOpen, setDialogAddProdutoOpen }) => {
     const [addTipoControle, setAddTipoControle] = useState("quantidade");
 
-    const { handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formProdutoSchema>>({
+    const { handleSubmit, control, reset, formState: { errors } } = useForm<z.infer<typeof formProdutoSchema>>({
         resolver: zodResolver(formProdutoSchema),
-        defaultValues: {
-            name: "",
-            status: "ACTIVE",
-            typeControl: "UNIT",
-            amount: "",
-            quantity: "",
-            supplierId: "",
-            categoryId: ""
-        }
+        defaultValues: valoresPadraoAdicionarProduto
     });
 
     const handleFormSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
-        onSubmit(data);
+        try {
+            onSubmit(data);
+            reset(valoresPadraoAdicionarProduto)
+        } catch (err) {
+
+        }
     };
 
     return (

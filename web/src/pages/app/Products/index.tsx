@@ -21,6 +21,24 @@ export const Products = () => {
     // Mutação para criar o produto
     const criarProdutoMutation = useMutation({
         mutationFn: async (data: z.infer<typeof formProdutoSchema>) => {
+            if (data.typeControl == 'UNIT') {
+                delete data.amount
+                if (data.quantity && typeof data.quantity === 'string') {
+                    data.quantity = parseInt(data.quantity, 10);
+                }
+            } else if (data.typeControl == 'WEITGHT') {
+                delete data.quantity
+                if (typeof data.amount === 'string') {
+                    data.amount = parseFloat(data.amount.replace(',', '.'));
+                }
+            }
+            if(!data.supplierId) {
+                delete data.supplierId
+            }
+            if(!data.categoryId) {
+                delete data.categoryId
+            }
+
             const response = await api.post("/product", data);
             return response.data;
         },

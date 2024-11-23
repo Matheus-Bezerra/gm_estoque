@@ -99,7 +99,7 @@ export const columns: ColumnDef<ProdutoApi>[] = [
         accessorKey: "quantity",
         header: () => <div>Quantidade</div>,
         cell: ({ row }) => (
-            <div>{row.getValue("quantity") || "-"}</div>
+            <div>{row.getValue("quantity") == 0 ? 0 : row.getValue("quantity") || "-"}</div>
         ),
         enableSorting: true,
     },
@@ -107,7 +107,7 @@ export const columns: ColumnDef<ProdutoApi>[] = [
         accessorKey: "amount",
         header: () => <div>Peso</div>,
         cell: ({ row }) => (
-            <div>{row.getValue("amount") || "-"}</div>
+            <div>{row.getValue("amount") == 0 ? 0 : row.getValue("amount") || "-"}</div>
         ),
         enableSorting: true,
     },
@@ -147,19 +147,37 @@ export const columns: ColumnDef<ProdutoApi>[] = [
 
             const editarProdutoMutation = useMutation({
                 mutationFn: async (data: z.infer<typeof formProdutoSchema>) => {
-                    const response = await api.post("/product", data);
+                    if (data.typeControl == 'UNIT') {
+                        delete data.amount
+                        if (data.quantity && typeof data.quantity === 'string') {
+                            data.quantity = parseInt(data.quantity, 10);
+                        }
+                    } else if (data.typeControl == 'WEITGHT') {
+                        delete data.quantity
+                        if (typeof data.amount === 'string') {
+                            data.amount = parseFloat(data.amount.replace(',', '.'));
+                        }
+                    }
+                    if (!data.supplierId) {
+                        delete data.supplierId
+                    }
+                    if (!data.categoryId) {
+                        delete data.categoryId
+                    }
+
+                    const response = await api.put(`/product/${produto.id}`, data);
                     return response.data;
                 },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["products"] });
-        
+
                     toast({
                         title: "Sucesso",
                         description: "Produto editado com sucesso!",
                         duration: 4000,
                         variant: "success",
                     });
-        
+
                     setOpenEdit(false)
                 },
                 onError: (error) => {
@@ -177,7 +195,6 @@ export const columns: ColumnDef<ProdutoApi>[] = [
                 editarProdutoMutation.mutate(data)
             };
 
-            // Mutação para deletar o produto
             const deletarProdutoMutation = useMutation({
                 mutationFn: async (produtoId: string) => {
                     const response = await api.delete(`/product/${produtoId}`,);
@@ -272,8 +289,6 @@ export function DataTable() {
         queryKey: ["products"],
         queryFn: async () => {
             const response = await api.get("/product")
-
-            console.log("Responseee ", response)
             return response.data
         },
     })

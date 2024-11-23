@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,10 @@ export function DialogEditProduto({
             name: produto.name,
             status: produto.status,
             typeControl: produto.typeControl,
-            amount: produto.amount,
-            quantity: produto.quantity,
-            supplierId: produto.supplierId,
-            categoryId: produto.categoryId
+            amount: produto.amount ? produto.amount : "",
+            quantity: produto.quantity ? produto.quantity : "",
+            supplierId: produto.supplierId ? produto.supplierId : "",
+            categoryId: produto.categoryId ? produto.categoryId : ""
         },
     });
 
@@ -50,6 +50,19 @@ export function DialogEditProduto({
         setValue("quantity", undefined);
         setValue("amount", undefined);
     };
+
+    useEffect(() => {
+        if (produto) {
+            setValue("name", produto.name);
+            setValue("status", produto.status);
+            setValue("typeControl", produto.typeControl);
+            setValue("amount", produto.amount ? produto.amount : "");
+            setValue("quantity", produto.quantity ? produto.quantity : "");
+            setValue("supplierId", produto.supplierId ? produto.supplierId : "");
+            setValue("categoryId", produto.categoryId ? produto.categoryId : "");
+            setTipoControle(produto.typeControl);
+        }
+    }, [produto, setValue]); 
 
     return (
         <Dialog open={open} onOpenChange={onClose}>

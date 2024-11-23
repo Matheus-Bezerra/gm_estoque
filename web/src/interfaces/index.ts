@@ -28,6 +28,16 @@ export interface Produto {
     criado: Date
 }
 
+export interface FornecedorAPI {
+    id: string,
+    name: string,
+    email: string,
+    createAt: Date,
+    updateAt: Date,
+    userId: string,
+    products: ProdutoApi[]
+}
+
 export interface ProdutoApi {
     id: string
     name: string
@@ -37,6 +47,8 @@ export interface ProdutoApi {
     status: "ACTIVE" | "INACTIVE"
     supplierId?: string
     categoryId?: string
+    category: Categoria
+    supplier: Fornecedor
     createAt: Date
     updateAt: Date
     userId: string
