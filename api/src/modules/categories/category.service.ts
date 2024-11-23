@@ -38,24 +38,28 @@ export class CategoryService {
 
     async updateCategory(id: string, category: CategoryUpdateInput): Promise<Category> {
 
-        const productsDisassociateCategories = [];
+        let data: Prisma.CategoryUpdateInput = {}
 
-        const categoryData = await this.prisma.category.findUnique({ where: { id }, include: { products: true } });
+        if (category.name) data.name = category.name;
+        if (category.color) data.color = category.color;
 
-        categoryData.products.forEach(product => {
-            if (!category.productsIds.includes(product.id)) {
-                productsDisassociateCategories.push({ id: product.id });
-            }
-        });
+        if (category.productsIds) {
+            const productsDisassociateCategories = [];
+            const categoryItem = await this.prisma.category.findUnique({ where: { id }, include: { products: true } });
+            categoryItem.products.forEach(product => {
+                if (!category.productsIds.includes(product.id)) {
+                    productsDisassociateCategories.push({ id: product.id });
+                }
+            });
+            const productsAssociateCategories = category.productsIds.filter(id => !categoryItem.products.map(product => product.id).includes(id));
 
-        const productsAssociateCategories = category.productsIds.filter(id => !categoryData.products.map(product => product.id).includes(id));
-
-        category.products = { connect: productsAssociateCategories.map(id => ({ id })) };
-
+            data.products = { disconnect: productsDisassociateCategories.map(id => id), connect: productsAssociateCategories.map(id => ({ id })) };
+        }
 
         return await this.prisma.category.update({
             where: { id },
-            data: category
+            data,
+            include: { products: true }
         });
     }
 

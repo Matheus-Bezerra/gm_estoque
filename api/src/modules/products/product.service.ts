@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Product, Prisma, TypeControl, Category } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductCreateInput, ProductGetAllInput } from './domain/products.interface';
+import { ProductCreateInput, ProductGetAllInput, ProductUpdateInput } from './domain/products.interface';
 
 @Injectable()
 export class ProductService {
@@ -55,10 +55,46 @@ export class ProductService {
         return await this.prisma.product.findMany(args);
     }
 
-    async updateProduct(id: string, product: Prisma.ProductUpdateInput): Promise<Product> {
+    async updateProduct(id: string, product: ProductUpdateInput): Promise<Product> {
+        
+        let data: Prisma.ProductUpdateInput = {};
+
+        const updateField = (field: keyof ProductUpdateInput, value: any) => {
+            if (value !== undefined) {
+                data[field] = value;
+            }
+        };
+
+        updateField('name', product.name);
+        updateField('typeControl', product.typeControl);
+        updateField('quantity', product.quantity);
+        updateField('amount', product.amount);
+
+        if (product.typeControl || product.supplierId || product.categoryId) {
+
+            const productItem = await this.prisma.product.findUnique({ where: { id } });
+
+            if(product.typeControl !== productItem.typeControl)
+                if (product.typeControl === TypeControl.UNIT) {
+                    data.amount = null;
+                } else if (product.typeControl === TypeControl.WEIGHT) {
+                    data.quantity = null;
+                }
+
+            if (product?.supplierId) {
+                data.supplier = { disconnect: { id: productItem.supplierId },connect: { id: product.supplierId } };
+            }
+
+            if (product?.categoryId) {
+                data.category = { disconnect: { id: productItem.categoryId }, connect: { id: product.categoryId } };
+            }
+    
+        }
+
         return await this.prisma.product.update({
             where: { id },
-            data: product
+            data,
+            include: { supplier: true, category: true },
         });
     }
 

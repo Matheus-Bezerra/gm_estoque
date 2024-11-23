@@ -32,7 +32,7 @@ export class SupplierService {
             {
                 where: { user: { id: userId } },
                 include: { products: true },
-                orderBy: { name: 'asc'  }
+                orderBy: { name: 'asc' }
             }
         );
     }
@@ -46,23 +46,27 @@ export class SupplierService {
 
     async updateSupplier(id: string, supplier: SupplierUpdateInput): Promise<Supplier> {
 
-        const productsDisassociateSuppliers = [];
+        let data: Prisma.SupplierUpdateInput = {}
 
-        const supplierData = await this.prisma.supplier.findUnique({ where: { id }, include: { products: true } });
+        if (supplier.name) data.name = supplier.name;
+        if (supplier.email) data.email = supplier.email;
 
-        supplierData.products.forEach(product => {
-            if (!supplier.productsIds.includes(product.id)) {
-                productsDisassociateSuppliers.push({ id: product.id });
-            }
-        });
-
-        const productsAssociateSuppliers = supplier.productsIds.filter(id => !supplierData.products.map(product => product.id).includes(id));
-
-        supplier.products = { connect: productsAssociateSuppliers.map(id => ({ id })) };
+        if (supplier.productsIds) {
+            const productsDisassociateSuppliers = [];
+            const supplierItem = await this.prisma.supplier.findUnique({ where: { id }, include: { products: true } });
+            supplierItem.products.forEach(product => {
+                if (!supplier.productsIds.includes(product.id)) {
+                    productsDisassociateSuppliers.push({ id: product.id });
+                }
+            });
+            const productsAssociateSuppliers = supplier.productsIds.filter(id => !supplierItem.products.map(product => product.id).includes(id));
+            data.products = { disconnect: productsDisassociateSuppliers.map(id => id), connect: productsAssociateSuppliers.map(id => ({ id })) };
+        }
 
         return await this.prisma.supplier.update({
             where: { id },
-            data: supplier
+            data,
+            include: { products: true }
         });
     }
 
