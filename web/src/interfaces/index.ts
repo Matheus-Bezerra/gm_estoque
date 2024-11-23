@@ -57,8 +57,8 @@ export interface ProdutoApi {
     status: "ACTIVE" | "INACTIVE"
     supplierId?: string
     categoryId?: string
-    category: Categoria
-    supplier: Fornecedor
+    category: CategoriaApi
+    supplier: FornecedorAPI
     createAt: Date
     updateAt: Date
     userId: string

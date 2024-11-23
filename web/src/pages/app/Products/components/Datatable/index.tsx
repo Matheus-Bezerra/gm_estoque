@@ -32,7 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Categoria, Fornecedor, ProdutoApi } from "@/interfaces"
+import { CategoriaApi, FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { fornecedoresLista } from "@/utils/data/fornecedores/lista"
 import { categoriasLista } from "@/utils/data/categorias/lista"
@@ -45,6 +45,7 @@ import { DialogEditProduto } from "@/pages/app/Products/components/Dialogs/Dialo
 import { api } from "@/axios"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
 
 
 export const columns: ColumnDef<ProdutoApi>[] = [
@@ -69,6 +70,35 @@ export const columns: ColumnDef<ProdutoApi>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+    },
+    {
+        accessorKey: "updateAt",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Última Atualização
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            function formatDate(date: Date): string {
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0"); // Mês começa em 0
+                const year = date.getFullYear();
+                const hours = String(date.getHours()).padStart(2, "0");
+                const minutes = String(date.getMinutes()).padStart(2, "0");
+
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+
+
+            const rawDate = row.getValue("updateAt") as string;
+            const formattedDate = formatDate(new Date(rawDate));
+            return <div className="capitalize">{formattedDate}</div>;
+
+        },
     },
     {
         accessorKey: "name",
@@ -112,25 +142,25 @@ export const columns: ColumnDef<ProdutoApi>[] = [
         enableSorting: true,
     },
     {
-        accessorKey: "supplierId",
+        accessorKey: "supplier",
         header: "Fornecedor",
         cell: ({ row }) => {
-            const fornecedores = row.getValue("supplierId") as Fornecedor; // Asserção de tipo
+            const fornecedor = row.getValue("supplier") as FornecedorAPI; // Asserção de tipo
             return (
                 <div>
-                    -
+                    {fornecedor ? fornecedor.name : '-'}
                 </div>
             );
         },
     },
     {
-        accessorKey: "categoryId",
+        accessorKey: "category",
         header: "Categoria",
         cell: ({ row }) => {
-            const categoria = row.getValue("categoryId") as Categoria; // Asserção de tipo
+            const categoria = row.getValue("category") as CategoriaApi
             return (
                 <div>
-                    {"-"}
+                    {categoria ? <Badge className="rounded-3xl" style={{ backgroundColor: categoria.color }}>{categoria.name}</Badge> : '-'}
                 </div>
             );
         },
