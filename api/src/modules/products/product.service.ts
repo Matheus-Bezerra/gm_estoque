@@ -38,7 +38,7 @@ export class ProductService {
         const args: Prisma.ProductFindManyArgs = {
             where: { user: { id: userId } },
             include: { supplier: true, category: true },
-            orderBy: { name: 'asc' }
+            orderBy: { updateAt: 'desc' }
         }
 
         if(input?.filters) {
