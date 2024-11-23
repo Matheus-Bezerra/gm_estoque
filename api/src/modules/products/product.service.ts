@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { Product, Prisma } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Product, Prisma, TypeControl, Category } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ProductCreateInput, ProductGetAllInput } from './domain/products.interface';
 
 @Injectable()
 export class ProductService {
@@ -9,18 +10,49 @@ export class ProductService {
     constructor(private prisma: PrismaService) { }
 
 
-    async createProduct(userId: string, product: Prisma.ProductCreateInput): Promise<Product> {
-        product.user = { connect: { id: userId } };
-        return await this.prisma.product.create({
-            data: product
-        });
+    async createProduct(userId: string, product: ProductCreateInput): Promise<Product> {
+           
+        let productCreate: Prisma.ProductCreateArgs = {
+            data: {
+                name: product.name,
+                typeControl: product.typeControl,
+                quantity: product.quantity,
+                amount: product.amount,
+                user: { connect: { id: userId } }
+            }, include: { supplier: true, category: true }
+        }
+
+        if(product.supplierId) {
+            productCreate.data.supplier = { connect: { id: product.supplierId } }
+        }
+
+        if(product.categoryId) {
+            productCreate.data.category = { connect: { id: product.categoryId } }
+        }
+
+        return await this.prisma.product.create(productCreate);
     }
 
-    async getAllProducts(userId: string): Promise<Product[]> {
-        return await this.prisma.product.findMany({
+    async getAllProducts(userId: string, input?: ProductGetAllInput): Promise<Product[]> {
+
+        const args: Prisma.ProductFindManyArgs = {
             where: { user: { id: userId } },
-            include: { supplier: true, category: true }
-        });
+            include: { supplier: true, category: true },
+            orderBy: { name: 'asc' }
+        }
+
+        if(input?.filters) {
+
+            if(input.filters.productsWithoutSupplier) {
+                args.where = { ...args.where, supplierId: null }
+            }
+
+            if(input.filters.productsWithoutCategory) {
+                args.where = { ...args.where, categoryId: null }
+            }
+        }
+
+        return await this.prisma.product.findMany(args);
     }
 
     async updateProduct(id: string, product: Prisma.ProductUpdateInput): Promise<Product> {
@@ -35,4 +67,16 @@ export class ProductService {
             where: { id }
         });
     }
+
+    async validateProduct(product: Prisma.ProductCreateInput | Prisma.ProductUpdateInput) {
+
+        if (product.typeControl == TypeControl.UNIT && (product.quantity == null || product.quantity as number < 0)) {
+            throw new BadRequestException('Quantity is required when typeControl is UNIT');
+        }
+        if (product.typeControl == TypeControl.WEIGHT && (product.amount == null || product.amount as number < 0)) {
+            throw new BadRequestException('Amount is required when typeControl is WEIGHT');
+        }
+
+    }
+
 }

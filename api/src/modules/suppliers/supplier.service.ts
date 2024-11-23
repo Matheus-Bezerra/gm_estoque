@@ -11,20 +11,28 @@ export class SupplierService {
 
 
     async createSupplier(userId: string, supplier: SupplierCreateInput): Promise<Supplier> {
-        supplier.user = { connect: { id: userId } };
-        supplier.products = { connect: supplier?.productsIds?.map(id => ({ id })) };
 
-        return await this.prisma.supplier.create({
-            data: supplier,
-            include: { products: true }
-        });
+        let supplierCreated: Prisma.SupplierCreateArgs = {
+            data: {
+                name: supplier.name,
+                email: supplier.email,
+                user: { connect: { id: userId } }
+            }, include: { products: true }
+        }
+
+        if (supplier.productsIds && supplier.productsIds.length > 0)
+            supplierCreated.data.products = { connect: supplier.productsIds.map(id => ({ id })) };
+
+
+        return await this.prisma.supplier.create(supplierCreated);
     }
 
     async getAllSuppliers(userId: string): Promise<Supplier[]> {
         return await this.prisma.supplier.findMany(
             {
                 where: { user: { id: userId } },
-                include: { products: true }
+                include: { products: true },
+                orderBy: { name: 'asc'  }
             }
         );
     }
@@ -37,15 +45,15 @@ export class SupplierService {
     }
 
     async updateSupplier(id: string, supplier: SupplierUpdateInput): Promise<Supplier> {
-        
+
         const productsDisassociateSuppliers = [];
 
         const supplierData = await this.prisma.supplier.findUnique({ where: { id }, include: { products: true } });
 
         supplierData.products.forEach(product => {
-           if(!supplier.productsIds.includes(product.id)) {
-               productsDisassociateSuppliers.push({ id: product.id });
-           }
+            if (!supplier.productsIds.includes(product.id)) {
+                productsDisassociateSuppliers.push({ id: product.id });
+            }
         });
 
         const productsAssociateSuppliers = supplier.productsIds.filter(id => !supplierData.products.map(product => product.id).includes(id));
