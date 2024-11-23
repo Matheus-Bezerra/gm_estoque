@@ -12,7 +12,7 @@ export class SupplierService {
 
     async createSupplier(userId: string, supplier: SupplierCreateInput): Promise<Supplier> {
         supplier.user = { connect: { id: userId } };
-        supplier.products = { connect: supplier.productsIds.map(id => ({ id })) };
+        supplier.products = { connect: supplier?.productsIds?.map(id => ({ id })) };
 
         return await this.prisma.supplier.create({
             data: supplier,
