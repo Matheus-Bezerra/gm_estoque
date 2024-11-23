@@ -6,14 +6,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Fornecedor } from "@/interfaces";
+import { FornecedorAPI, ProdutoApi } from "@/interfaces";
 
 interface DialogEditFornecedorProps {
-    fornecedor: Fornecedor;
+    fornecedor: FornecedorAPI;
     onSubmit: SubmitHandler<FornecedorFormValues>;
     open: boolean;
     onClose: (open: boolean) => void;
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
 }
 
 
@@ -29,11 +29,14 @@ export function DialogEditFornecedor({
     const { control, handleSubmit, formState: { errors } } = useForm<FornecedorFormValues>({
         resolver: zodResolver(formFornecedorSchema),
         defaultValues: {
-            nome: fornecedor.nome,
+            name: fornecedor.name,
             email: fornecedor.email,
-            produtos: fornecedor.produtosAssociados.map(pa => pa.value)
+            productsIds: fornecedor.products.map(pa => pa.id)
         },
     });
+    const produtosSelect = produtosLista.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
 
 
     return (
@@ -47,13 +50,13 @@ export function DialogEditFornecedor({
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
-                                <Input id="nome" placeholder="Nome" {...field} />
+                                <Input id="name" placeholder="Nome" {...field} />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>
 
                     <div>
@@ -64,20 +67,20 @@ export function DialogEditFornecedor({
                                 <Input id="email" placeholder="E-mail" {...field} />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.email && <span className="text-red-500">{errors.email.message}</span>}
                     </div>
 
 
                     {/* MultiSelect para Fornecedores */}
                     <Controller
                         control={control}
-                        name="produtos"
+                        name="productsIds"
                         render={({ field: { onChange, value } }) => {
                             
                             return (
                                 <div>
                                     <MultiSelect
-                                        options={produtosLista}
+                                        options={produtosSelect}
                                         onValueChange={onChange}
                                         defaultValue={value || []}
                                         placeholder="Produtos"

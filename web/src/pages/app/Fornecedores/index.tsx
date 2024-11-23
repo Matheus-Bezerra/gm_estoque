@@ -4,10 +4,9 @@ import { SubmitHandler } from "react-hook-form";
 import { z } from "zod"
 import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema"
 import { DialogAddFornecedor } from "./components/Dialogs/DialogAddFornecedor";
-import { produtosLista } from "@/utils/data/products/lista";
 import { DataTable } from "./components/Datatable";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/axios";
 
 
@@ -28,6 +27,7 @@ export const Fornecedores = () => {
             },
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+                queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
     
                 toast({
                     title: "Sucesso",
@@ -53,6 +53,16 @@ export const Fornecedores = () => {
         criarFornecedorMutation.mutate(data)
     }
 
+    const { data: produtosAssociados = [] } = useQuery({
+        queryKey: ["associatedProducts"],
+        queryFn: async () => {
+            const response = await api.get("/product");
+            return response.data;
+        },
+    });
+
+    console.log("Produtoss Associados ", produtosAssociados)
+
     return (
         <>
             <Helmet title="Fornecedores" />
@@ -61,7 +71,7 @@ export const Fornecedores = () => {
 
             <div className="mt-5">
                 <DialogAddFornecedor
-                    produtosLista={produtosLista}
+                    produtosLista={produtosAssociados}
                     onSubmit={addFornecedor}
                     isDialogAddFornecedorOpen={isDialogAdd}
                     setDialogAddFornecedorOpen={setIsDialogAdd}

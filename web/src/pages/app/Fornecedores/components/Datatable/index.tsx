@@ -32,23 +32,22 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Fornecedor, FornecedorAPI, ProdutoApi } from "@/interfaces"
+import { FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteFornecedor } from "../Dialogs/DialogDeleteFornecedor"
 import { DialogEditFornecedor } from "../Dialogs/DialogEditFornecedor"
-import { produtosLista } from "@/utils/data/products/lista"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
 import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
 import { formFornecedorSchema } from "../../validators/formFornecedorSchema"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/axios"
 import { Skeleton } from "@/components/ui/skeleton"
 
 
-export const columns: ColumnDef<FornecedorAPI>[] = [
+export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -105,28 +104,48 @@ export const columns: ColumnDef<FornecedorAPI>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
+            const queryClient = useQueryClient();
             const fornecedor = row.original;
             const [openEdit, setOpenEdit] = React.useState(false);
             const [openAssociarProdutos, setOpenAssociarProdutos] = React.useState(false);
             const [openDelete, setOpenDelete] = React.useState(false);
             const { toast } = useToast()
 
+            const editarProdutoMutation = useMutation({
+                mutationFn: async (data: z.infer<typeof formFornecedorSchema>) => {
+                    const response = await api.put(`/supplier/${fornecedor.id}`, data);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
+
+                    toast({
+                        title: "Sucesso",
+                        description: "Fornecedor editado com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+
+                    setOpenEdit(false)
+                },
+                onError: (error) => {
+                    console.error("Erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao editar Fornecedor: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
             const handleEditSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
-                console.log(data);
-
-                setOpenEdit(false);
-
-                toast({
-                    title: "Sucesso",
-                    description: "Fornecedor Editado com sucesso!",
-                    duration: 4000,
-                    variant: "success"
-                });
+                editarProdutoMutation.mutate(data)
             };
 
             const handleAssociarSubmit: SubmitHandler<z.infer<typeof formAssociarProdutosSchema>> = (data) => {
                 console.log("Dataaa ", data);
-
                 setOpenAssociarProdutos(false);
 
                 toast({
@@ -137,16 +156,37 @@ export const columns: ColumnDef<FornecedorAPI>[] = [
                 });
             };
 
-            const handleDeleteFornecedor = () => {
-                console.log("Fornecedor deletado!", fornecedor)
-                setOpenDelete(false);
+            const deletarFornecedorMutation = useMutation({
+                mutationFn: async (fornecedorId: string) => {
+                    const response = await api.delete(`/supplier/${fornecedorId}`,);
+                    return response.data;
+                },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedProducts"] });
 
-                toast({
-                    title: "Sucesso",
-                    description: "Fornecedor removido com sucesso!",
-                    duration: 4000,
-                    variant: "success"
-                });
+                    toast({
+                        title: "Sucesso",
+                        description: "Fornecedor remvoido com sucesso!",
+                        duration: 4000,
+                        variant: "success",
+                    });
+
+                    setOpenDelete(false);
+                },
+                onError: (error) => {
+                    console.error("erro ", error)
+                    toast({
+                        title: "Erro",
+                        description: `Erro ao deletar Fornecedor: ${error.message}`,
+                        duration: 4000,
+                        variant: "destructive",
+                    });
+                },
+            });
+
+            const handleDeleteFornecedor = () => {
+                deletarFornecedorMutation.mutate(fornecedor.id)
             };
 
 
@@ -182,21 +222,21 @@ export const columns: ColumnDef<FornecedorAPI>[] = [
                     </DropdownMenu>
 
                     {/* Modal de edição */}
-                    {/* <DialogEditFornecedor
+                    <DialogEditFornecedor
                         fornecedor={fornecedor}
                         open={openEdit}
                         produtosLista={produtosLista}
                         onClose={() => setOpenEdit(false)}
                         onSubmit={handleEditSubmit}
-                    /> */}
+                    />
 
-                    {/* <DialogAssociarProdutos
+                    <DialogAssociarProdutos
                         fornecedor={fornecedor}
                         open={openAssociarProdutos}
                         produtosLista={produtosLista}
                         onClose={() => setOpenAssociarProdutos(false)}
                         onSubmit={handleAssociarSubmit}
-                    /> */}
+                    />
 
                     {/* Modal de confirmação de exclusão */}
                     <DialogDeleteFornecedor
@@ -229,10 +269,19 @@ export function DataTable() {
         },
     })
 
+    // Fetch de produtos associados
+    const { data: produtosAssociados = [] } = useQuery({
+        queryKey: ["associatedProducts"],
+        queryFn: async () => {
+            const response = await api.get("/product");
+            return response.data;
+        },
+    });
+
 
     const table = useReactTable({
         data: fornecedores,
-        columns,
+        columns: columns(produtosAssociados),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),

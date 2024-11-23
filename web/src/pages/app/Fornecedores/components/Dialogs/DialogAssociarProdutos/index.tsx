@@ -2,18 +2,17 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Fornecedor } from "@/interfaces";
+import { FornecedorAPI, ProdutoApi } from "@/interfaces";
 import { formAssociarProdutosSchema } from "../../../validators/formAssociarProdutosSchema";
 
 interface DialogAssociarProdutos {
-    fornecedor: Fornecedor;
+    fornecedor: FornecedorAPI;
     onSubmit: SubmitHandler<FornecedorAssociarValues>;
     open: boolean;
     onClose: (open: boolean) => void;
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
 }
 
 type FornecedorAssociarValues = z.infer<typeof formAssociarProdutosSchema>;
@@ -28,16 +27,19 @@ export function DialogAssociarProdutos({
     const { control, handleSubmit } = useForm<FornecedorAssociarValues>({
         resolver: zodResolver(formAssociarProdutosSchema),
         defaultValues: {
-            produtos: fornecedor.produtosAssociados.map(pa => pa.value)
+            produtos: fornecedor.products.map(pa => pa.id)
         },
     });
+    const produtosSelect = produtosLista.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Produtos associados</DialogTitle>
-                    <DialogDescription>Associe "{fornecedor.nome}" para os produtos disponíveis</DialogDescription>
+                    <DialogDescription>Associe "{fornecedor.name}" para os produtos disponíveis</DialogDescription>
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -50,7 +52,7 @@ export function DialogAssociarProdutos({
                             return (
                                 <div>
                                     <MultiSelect
-                                        options={produtosLista}
+                                        options={produtosSelect}
                                         onValueChange={onChange}
                                         defaultValue={value || []}
                                         placeholder="Produtos"

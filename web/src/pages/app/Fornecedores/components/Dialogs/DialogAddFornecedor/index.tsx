@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { ProdutoApi } from "@/interfaces";
 
 interface DialogAddFornecedorProps {
-    produtosLista: { label: string, value: string }[];
+    produtosLista: ProdutoApi[];
     onSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>>;
     isDialogAddFornecedorOpen: boolean;
     setDialogAddFornecedorOpen: (isOpen: boolean) => void;
@@ -27,7 +28,11 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
     const handleFormSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
         onSubmit(data);
     };
-    
+
+    const produtosSelect = produtosLista.map(pa => {
+        return { label: pa.name, value: pa.id }
+    })
+
     return (
         <Dialog open={isDialogAddFornecedorOpen} onOpenChange={setDialogAddFornecedorOpen}>
             <DialogTrigger asChild>
@@ -50,7 +55,7 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
                             )}
                         />
                         {errors.name && <span className="text-red-500">{errors.name.message}</span>}
-                    </div>    
+                    </div>
 
                     <div>
                         <Controller
@@ -61,7 +66,7 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
                             )}
                         />
                         {errors.email && <span className="text-red-500">{errors.email.message}</span>}
-                    </div>                    
+                    </div>
 
 
                     <Controller
@@ -69,7 +74,7 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
                         control={control}
                         render={({ field }) => (
                             <MultiSelect
-                                options={produtosLista}
+                                options={produtosSelect}
                                 onValueChange={field.onChange}
                                 placeholder="Produtos"
                                 variant="inverted"
