@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { handlePesoInput } from "@/utils/validations/handlePesoInput";
+import { CategoriaApi, FornecedorAPI } from "@/interfaces";
 
 
 interface DialogAddProdutoProps {
-    fornecedoresLista: { label: string, value: string }[];
-    categoriasLista: { label: string, value: string }[];
+    fornecedoresLista: FornecedorAPI[];
+    categoriasLista: CategoriaApi[];
     onSubmit: SubmitHandler<z.infer<typeof formProdutoSchema>>;
     isDialogAddProdutoOpen: boolean;
     setDialogAddProdutoOpen: (isOpen: boolean) => void;
@@ -152,7 +153,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                 </SelectTrigger>
                                 <SelectContent>
                                     {fornecedoresLista.map((fornecedor) => (
-                                        <SelectItem value={fornecedor.value}>{fornecedor.label}</SelectItem>
+                                        <SelectItem value={fornecedor.id}>{fornecedor.name}</SelectItem>
                                     ))}
 
                                 </SelectContent>
@@ -173,7 +174,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                     </SelectTrigger>
                                     <SelectContent>
                                         {categoriasLista.map((categoria) => (
-                                            <SelectItem value={categoria.value}>{categoria.label}</SelectItem>
+                                            <SelectItem value={categoria.id}>{categoria.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

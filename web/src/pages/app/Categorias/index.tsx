@@ -32,7 +32,7 @@ export const Categorias = () => {
             toast({
                 title: "Sucesso",
                 description: "Categoria adicionada com sucesso!",
-                duration: 4000,
+                duration: 2000,
                 variant: "success",
             });
 
@@ -43,7 +43,7 @@ export const Categorias = () => {
             toast({
                 title: "Erro",
                 description: `Erro ao adicionar Categoria: ${error.message}`,
-                duration: 4000,
+                duration: 2000,
                 variant: "destructive",
             });
         },

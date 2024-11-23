@@ -123,7 +123,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
                     toast({
                         title: "Sucesso",
                         description: "Fornecedor editado com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -135,7 +135,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
                     toast({
                         title: "Erro",
                         description: `Erro ao editar Fornecedor: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },
@@ -166,7 +166,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
                     toast({
                         title: "Sucesso",
                         description: "Fornecedor remvoido com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -177,7 +177,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<FornecedorAPI>[]
                     toast({
                         title: "Erro",
                         description: `Erro ao deletar Fornecedor: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },

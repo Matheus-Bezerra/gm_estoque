@@ -15,7 +15,7 @@ export const ProtectedRoute = () => {
                     toast({
                         title: "Token Expirado",
                         description: "Faça o login novamente na aplicação",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive"
                     });
                     logout()

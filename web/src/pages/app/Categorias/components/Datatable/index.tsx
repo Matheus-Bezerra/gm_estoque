@@ -131,7 +131,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] 
                     toast({
                         title: "Sucesso",
                         description: "Categorias editada com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -141,7 +141,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] 
                     toast({
                         title: "Erro",
                         description: `Erro ao editar Categoria: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },
@@ -173,7 +173,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] 
                     toast({
                         title: "Sucesso",
                         description: "Categoria remvoida com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -184,7 +184,7 @@ export const columns = (produtosLista: ProdutoApi[]): ColumnDef<CategoriaApi>[] 
                     toast({
                         title: "Erro",
                         description: `Erro ao deletar Categoria: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },

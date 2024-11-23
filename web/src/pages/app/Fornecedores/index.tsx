@@ -32,7 +32,7 @@ export const Fornecedores = () => {
                 toast({
                     title: "Sucesso",
                     description: "Fornecedor adicionado com sucesso!",
-                    duration: 4000,
+                    duration: 2000,
                     variant: "success",
                 });
     
@@ -43,7 +43,7 @@ export const Fornecedores = () => {
                 toast({
                     title: "Erro",
                     description: `Erro ao adicionar fornecedor: ${error.message}`,
-                    duration: 4000,
+                    duration: 2000,
                     variant: "destructive",
                 });
             },

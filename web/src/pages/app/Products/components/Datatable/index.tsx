@@ -34,8 +34,6 @@ import {
 } from "@/components/ui/table"
 import { CategoriaApi, FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
-import { fornecedoresLista } from "@/utils/data/fornecedores/lista"
-import { categoriasLista } from "@/utils/data/categorias/lista"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 import { SubmitHandler } from "react-hook-form";
@@ -48,7 +46,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 
 
-export const columns: ColumnDef<ProdutoApi>[] = [
+export const columns = (fornecedoresLista: FornecedorAPI[], categoriasLista: CategoriaApi[]): ColumnDef<ProdutoApi>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -200,11 +198,13 @@ export const columns: ColumnDef<ProdutoApi>[] = [
                 },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["products"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
 
                     toast({
                         title: "Sucesso",
                         description: "Produto editado com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -215,7 +215,7 @@ export const columns: ColumnDef<ProdutoApi>[] = [
                     toast({
                         title: "Erro",
                         description: `Erro ao editar produto: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },
@@ -232,11 +232,13 @@ export const columns: ColumnDef<ProdutoApi>[] = [
                 },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["products"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
+                    queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
 
                     toast({
                         title: "Sucesso",
                         description: "Produto remvoido com sucesso!",
-                        duration: 4000,
+                        duration: 2000,
                         variant: "success",
                     });
 
@@ -247,7 +249,7 @@ export const columns: ColumnDef<ProdutoApi>[] = [
                     toast({
                         title: "Erro",
                         description: `Erro ao deletar produto: ${error.message}`,
-                        duration: 4000,
+                        duration: 2000,
                         variant: "destructive",
                     });
                 },
@@ -323,9 +325,25 @@ export function DataTable() {
         },
     })
 
+    const { data: fornecedoresLista = [] } = useQuery({
+        queryKey: ["associatedSuppliers"],
+        queryFn: async () => {
+            const response = await api.get("/supplier");
+            return response.data;
+        },
+    });
+
+    const { data: categoriasLista = [] } = useQuery({
+        queryKey: ["associatedCategories"],
+        queryFn: async () => {
+            const response = await api.get("/category");
+            return response.data;
+        },
+    });
+
     const table = useReactTable({
         data: produtos, // Dados retornados pela API
-        columns,
+        columns: columns(fornecedoresLista, categoriasLista),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),

@@ -53,7 +53,7 @@ export function Login() {
             toast({
               title: "Login incorreto",
               description: "Preencha os dados corretamente para entrar na aplicação",
-              duration: 4000,
+              duration: 2000,
               variant: "destructive"
             });
           })
@@ -64,7 +64,7 @@ export function Login() {
         toast({
           title: "Erro",
           description: "Houve algum erro, tente novamente mais tarde",
-          duration: 4000,
+          duration: 2000,
           variant: "destructive"
         });
       })

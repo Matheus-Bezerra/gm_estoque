@@ -8,15 +8,15 @@ import { handlePesoInput } from "@/utils/validations/handlePesoInput";
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ProdutoApi } from "@/interfaces";
+import { CategoriaApi, FornecedorAPI, ProdutoApi } from "@/interfaces";
 
 interface DialogEditProdutoProps {
     produto: ProdutoApi;
     onSubmit: SubmitHandler<ProdutoFormValues>;
     open: boolean;
     onClose: (open: boolean) => void;
-    fornecedoresLista: { label: string, value: string }[];
-    categoriasLista: { label: string, value: string }[];
+    fornecedoresLista: FornecedorAPI[];
+    categoriasLista: CategoriaApi[];
 }
 
 
@@ -166,7 +166,7 @@ export function DialogEditProduto({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {fornecedoresLista.map((fornecedor) => (
-                                        <SelectItem value={fornecedor.value}>{fornecedor.label}</SelectItem>
+                                        <SelectItem value={fornecedor.id}>{fornecedor.name}</SelectItem>
                                     ))}
 
                                 </SelectContent>
@@ -189,7 +189,7 @@ export function DialogEditProduto({
                                     </SelectTrigger>
                                     <SelectContent>
                                         {categoriasLista.map((categoria) => (
-                                            <SelectItem value={categoria.value}>{categoria.label}</SelectItem>
+                                            <SelectItem value={categoria.id}>{categoria.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

@@ -1,15 +1,13 @@
 import { Helmet } from "react-helmet-async";
 import { DataTable } from "./components/Datatable";
 import { useToast } from "@/hooks/use-toast";
-import { categoriasLista } from "@/utils/data/categorias/lista";
-import { fornecedoresLista } from "@/utils/data/fornecedores/lista";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod"
 import { formProdutoSchema } from "@/pages/app/Products/validators/formProdutoSchema"
 import { DialogAddProduto } from "./components/Dialogs/DialogAddProduto";
 import { useState } from "react";
 import { api } from "@/axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 
@@ -44,11 +42,13 @@ export const Products = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["associatedSuppliers"] });
+            queryClient.invalidateQueries({ queryKey: ["associatedCategories"] });
 
             toast({
                 title: "Sucesso",
                 description: "Produto adicionado com sucesso!",
-                duration: 4000,
+                duration: 2000,
                 variant: "success",
             });
 
@@ -59,7 +59,7 @@ export const Products = () => {
             toast({
                 title: "Erro",
                 description: `Erro ao adicionar produto: ${error.message}`,
-                duration: 4000,
+                duration: 2000,
                 variant: "destructive",
             });
         },
@@ -68,6 +68,23 @@ export const Products = () => {
     const addProduto: SubmitHandler<z.infer<typeof formProdutoSchema>> = (data) => {
         criarProdutoMutation.mutate(data)
     }
+
+    const { data: fornecedoresLista = [] } = useQuery({
+        queryKey: ["associatedSuppliers"],
+        queryFn: async () => {
+            const response = await api.get("/supplier");
+            return response.data;
+        },
+    });
+
+    const { data: categoriasLista = [] } = useQuery({
+        queryKey: ["associatedCategories"],
+        queryFn: async () => {
+            const response = await api.get("/category");
+            return response.data;
+        },
+    });
+
 
     return (
         <>
