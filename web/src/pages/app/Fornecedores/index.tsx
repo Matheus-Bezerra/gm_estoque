@@ -7,23 +7,50 @@ import { DialogAddFornecedor } from "./components/Dialogs/DialogAddFornecedor";
 import { produtosLista } from "@/utils/data/products/lista";
 import { DataTable } from "./components/Datatable";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/axios";
 
 
 
 export const Fornecedores = () => {
     const { toast } = useToast()
     const [isDialogAdd, setIsDialogAdd] = useState(false)
+    const queryClient = useQueryClient();
+
+        // Mutação para criar o produto
+        const criarFornecedorMutation = useMutation({
+            mutationFn: async (data: z.infer<typeof formFornecedorSchema>) => {
+                if(!data.productsIds || data.productsIds.length < 1) {
+                    delete data.productsIds
+                }
+                const response = await api.post("/supplier", data);
+                return response.data;
+            },
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+    
+                toast({
+                    title: "Sucesso",
+                    description: "Fornecedor adicionado com sucesso!",
+                    duration: 4000,
+                    variant: "success",
+                });
+    
+                setIsDialogAdd(false)
+            },
+            onError: (error) => {
+                console.error("Erro ", error)
+                toast({
+                    title: "Erro",
+                    description: `Erro ao Fornecedor produto: ${error.message}`,
+                    duration: 4000,
+                    variant: "destructive",
+                });
+            },
+        });
 
     const addFornecedor: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
-        console.log("Data ", data)
-        toast({
-            title: "Sucesso",
-            description: "Fornecedor adicionado com sucesso!",
-            duration: 4000,
-            variant: "success"
-        })
-
-        setIsDialogAdd(false)
+        criarFornecedorMutation.mutate(data)
     }
 
     return (

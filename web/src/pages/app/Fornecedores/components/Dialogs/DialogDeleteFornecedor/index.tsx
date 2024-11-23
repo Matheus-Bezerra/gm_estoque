@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Fornecedor } from "@/interfaces";
+import { FornecedorAPI } from "@/interfaces";
 
 interface DialogDeleteFornecedorProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    fornecedor: Fornecedor;
+    fornecedor: FornecedorAPI;
 }
 
 export function DialogDeleteFornecedor({ open, onClose, onConfirm, fornecedor }: DialogDeleteFornecedorProps) {
@@ -19,7 +19,7 @@ export function DialogDeleteFornecedor({ open, onClose, onConfirm, fornecedor }:
                 </DialogHeader>
                 
                 <p className="text-foreground">
-                    Tem certeza que deseja excluir o Fornecedor <span className="font-bold text-xl">"{fornecedor.nome}"</span>?
+                    Tem certeza que deseja excluir o Fornecedor <span className="font-bold text-xl">"{fornecedor.name}"</span>?
                 </p>
                 
                 <DialogFooter>

@@ -32,7 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Fornecedor, objetoAssociado, ProdutoApi } from "@/interfaces"
+import { Fornecedor, FornecedorAPI, ProdutoApi } from "@/interfaces"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
@@ -40,7 +40,6 @@ import { SubmitHandler } from "react-hook-form";
 import { DialogDeleteFornecedor } from "../Dialogs/DialogDeleteFornecedor"
 import { DialogEditFornecedor } from "../Dialogs/DialogEditFornecedor"
 import { produtosLista } from "@/utils/data/products/lista"
-import { fornecedores } from "@/utils/data/fornecedores"
 import { DialogAssociarProdutos } from "../Dialogs/DialogAssociarProdutos"
 import { formAssociarProdutosSchema } from "../../validators/formAssociarProdutosSchema"
 import { formFornecedorSchema } from "../../validators/formFornecedorSchema"
@@ -49,7 +48,7 @@ import { api } from "@/axios"
 import { Skeleton } from "@/components/ui/skeleton"
 
 
-export const columns: ColumnDef<Fornecedor>[] = [
+export const columns: ColumnDef<FornecedorAPI>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -183,21 +182,21 @@ export const columns: ColumnDef<Fornecedor>[] = [
                     </DropdownMenu>
 
                     {/* Modal de edição */}
-                    <DialogEditFornecedor
+                    {/* <DialogEditFornecedor
                         fornecedor={fornecedor}
                         open={openEdit}
                         produtosLista={produtosLista}
                         onClose={() => setOpenEdit(false)}
                         onSubmit={handleEditSubmit}
-                    />
+                    /> */}
 
-                    <DialogAssociarProdutos
+                    {/* <DialogAssociarProdutos
                         fornecedor={fornecedor}
                         open={openAssociarProdutos}
                         produtosLista={produtosLista}
                         onClose={() => setOpenAssociarProdutos(false)}
                         onSubmit={handleAssociarSubmit}
-                    />
+                    /> */}
 
                     {/* Modal de confirmação de exclusão */}
                     <DialogDeleteFornecedor
@@ -262,7 +261,7 @@ export function DataTable() {
     if (isError) {
         return (
             <div className="text-center text-red-500">
-                Erro ao carregar os produtos. Tente novamente mais tarde.
+                Erro ao carregar os fornecedores. Tente novamente mais tarde.
             </div>
         )
     }
@@ -272,9 +271,9 @@ export function DataTable() {
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Procurar fornecedor"
-                    value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("nome")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />

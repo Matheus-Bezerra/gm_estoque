@@ -2,7 +2,6 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formFornecedorSchema } from "@/pages/app/Fornecedores/validators/formFornecedorSchema";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -16,24 +15,17 @@ interface DialogAddFornecedorProps {
 }
 
 export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produtosLista, onSubmit, isDialogAddFornecedorOpen, setDialogAddFornecedorOpen }) => {
-    const { toast } = useToast();
 
     const { handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formFornecedorSchema>>({
         resolver: zodResolver(formFornecedorSchema),
         defaultValues: {
-            nome: "",
-
+            name: "",
+            email: ""
         }
     });
 
     const handleFormSubmit: SubmitHandler<z.infer<typeof formFornecedorSchema>> = (data) => {
         onSubmit(data);
-        toast({
-            title: "Sucesso",
-            description: "Fornecedor adicionado com sucesso!",
-            duration: 4000,
-            variant: "success"
-        });
     };
     
     return (
@@ -51,13 +43,13 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
                 <form className="grid gap-4" onSubmit={handleSubmit(handleFormSubmit)}>
                     <div>
                         <Controller
-                            name="nome"
+                            name="name"
                             control={control}
                             render={({ field }) => (
                                 <Input {...field} placeholder="Nome" />
                             )}
                         />
-                        {errors.nome && <span className="text-red-500">{errors.nome.message}</span>}
+                        {errors.name && <span className="text-red-500">{errors.name.message}</span>}
                     </div>    
 
                     <div>
@@ -73,7 +65,7 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
 
 
                     <Controller
-                        name="produtos"
+                        name="productsIds"
                         control={control}
                         render={({ field }) => (
                             <MultiSelect

@@ -5,5 +5,5 @@ export const formFornecedorSchema = z.object({
         message: "Nome do produto deve ter no mínimo 2 caracteres",
     }),
     email: z.string({message: "E-mail é obrigatório"}).email("E-mail inválido"),
-    products: z.array(z.string()).optional()
+    productsIds: z.array(z.string()).optional()
 });
