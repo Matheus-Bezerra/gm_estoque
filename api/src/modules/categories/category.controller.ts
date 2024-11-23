@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CategoryService } from './category.service';
+import { CategoryCreateInput, CategoryUpdateInput } from './domain/category.interface';
 
 @Controller('category')
 export class CategoryController {
@@ -12,12 +13,12 @@ export class CategoryController {
     }
 
     @Post()
-    createCategory(@Request() req, @Body() category: Prisma.CategoryCreateInput) {
+    createCategory(@Request() req, @Body() category: CategoryCreateInput) {
         return this.categoryService.createCategory(req.user.id, category);
     }
 
     @Put(':id')
-    updateCategory(@Param('id') id: string, @Body() updateCategory: Prisma.CategoryUpdateInput) {
+    updateCategory(@Param('id') id: string, @Body() updateCategory: CategoryUpdateInput) {
         return this.categoryService.updateCategory(id, updateCategory);
     }
 

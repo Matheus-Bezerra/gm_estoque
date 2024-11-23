@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { SupplierService } from './supplier.service';
+import { SupplierCreateInput, SupplierUpdateInput } from './domain/supplier.interface.controller';
 
 @Controller('supplier')
 export class SupplierController {
@@ -12,12 +13,12 @@ export class SupplierController {
     }
 
     @Post()
-    createSupplier(@Request() req, @Body() supplier: Prisma.SupplierCreateInput) {
+    createSupplier(@Request() req, @Body() supplier: SupplierCreateInput) {
         return this.supplierService.createSupplier(req.user.id, supplier);
     }
 
     @Put(':id')
-    updateSupplier(@Param('id') id: string, @Body() updateSupplier: Prisma.SupplierUpdateInput) {
+    updateSupplier(@Param('id') id: string, @Body() updateSupplier: SupplierUpdateInput) {
         return this.supplierService.updateSupplier(id, updateSupplier);
     }
 
