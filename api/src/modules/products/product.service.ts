@@ -38,29 +38,34 @@ export class ProductService {
     async getAllProducts(userId: string, input?: ProductGetAllInput): Promise<Product[]> {
 
         const args: Prisma.ProductFindManyArgs = {
-            where: { user: { id: userId } },
+            where: {},
             include: { supplier: true, category: true },
             orderBy: { updateAt: 'desc' }
         }
 
-        args.where.OR = [];
-        
+        args.where.AND = [];
+        args.where.AND.push({ user: { id: userId } });
+
+        const filtersOR = [];
+
         if (input?.productsWithoutSupplier) {
-            args.where.OR.push({ supplierId: null })
+            filtersOR.push({ supplierId: null })
         }
 
         if (input?.productsWithoutCategory) {
-            args.where.OR.push({ categoryId: null })
+            filtersOR.push({ categoryId: null })
         }
 
         if (input?.supplierId) {
-            args.where.OR.push({ supplierId: input.supplierId })
+            filtersOR.push({ supplierId: input.supplierId })
         }
 
         if (input?.categoryId) {
-            args.where.OR.push({ categoryId: input.categoryId })
+            filtersOR.push({ categoryId: input.categoryId })
         }
 
+        args.where.AND.push({ OR: filtersOR });
+        
         return await this.prisma.product.findMany(args);
     }
 
