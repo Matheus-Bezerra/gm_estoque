@@ -74,7 +74,7 @@ export function Cadastro() {
 
                 toast({
                     title: "Erro",
-                    description: "Houve um terro tente novamente mais tarde!",
+                    description: `${error.message}`,
                     duration: 3000,
                     variant: "destructive"
                 });
