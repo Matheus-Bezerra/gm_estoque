@@ -39,11 +39,17 @@ export class AuthService {
       throw new NotFoundException("Usuário não encontrado");
     }
 
-    const passHash = hash('sha256', resetPasswordInput.oldPassword);
-    if (user.password !== passHash) {
+    const oldPasswordHash = hash('sha256', resetPasswordInput.oldPassword);
+    const newPasswordHash = hash('sha256', resetPasswordInput.newPassword);
+    
+    if (user.password !== oldPasswordHash) {
       throw new BadRequestException("A senha antiga está incorreta");
     }
 
-    return await this.userService.updateUser(userId, { password: passHash });
+    if(user.password === newPasswordHash){
+      throw new BadRequestException("A nova senha não pode ser igual a antiga");
+    }
+
+    return await this.userService.updateUser(userId, { password: newPasswordHash });
   }
 }
