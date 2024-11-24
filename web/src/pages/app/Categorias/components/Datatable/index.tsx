@@ -220,7 +220,7 @@ export function DataTable() {
     const { data: produtosAssociados = [] } = useQuery({
         queryKey: ["associatedProducts"],
         queryFn: async () => {
-            const response = await api.get("/product");
+            const response = await api.get("/product?productsWithoutCategory=true");
             return response.data;
         },
     });

@@ -44,9 +44,13 @@ export function DialogEditCategoria({
             inputRef.current.click();
         }
     };
-    const produtosSelect = produtosLista.map(pa => {
-        return { label: pa.name, value: pa.id }
+    let produtosSelect = produtosLista.map(pa => {
+        return {label: pa.name, value: pa.id}
     })
+    const produtosSelecionadosCategorias = categoria.products.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
+    produtosSelect = [...produtosSelect, ...produtosSelecionadosCategorias]
 
     return (
         <Dialog open={open} onOpenChange={onClose}>

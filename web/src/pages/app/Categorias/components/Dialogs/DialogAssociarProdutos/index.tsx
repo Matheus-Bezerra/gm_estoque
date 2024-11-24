@@ -30,9 +30,13 @@ export function DialogAssociarProdutos({
             productsId: categoria.products.map(pa => pa.id)
         },
     });
-    const produtosSelect = produtosLista.map(pa => {
-        return { label: pa.name, value: pa.id }
+    let produtosSelect = produtosLista.map(pa => {
+        return {label: pa.name, value: pa.id}
     })
+    const produtosSelecionadosCategorias = categoria.products.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
+    produtosSelect = [...produtosSelect, ...produtosSelecionadosCategorias]
 
 
     return (

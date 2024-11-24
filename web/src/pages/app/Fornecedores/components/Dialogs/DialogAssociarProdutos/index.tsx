@@ -30,9 +30,13 @@ export function DialogAssociarProdutos({
             productsId: fornecedor.products.map(pa => pa.id)
         },
     });
-    const produtosSelect = produtosLista.map(pa => {
+    let produtosSelect = produtosLista.map(pa => {
         return {label: pa.name, value: pa.id}
     })
+    const produtosSelecionadosFornecedores = fornecedor.products.map(pa => {
+        return {label: pa.name, value: pa.id}
+    })
+    produtosSelect = [...produtosSelect, ...produtosSelecionadosFornecedores]
 
     return (
         <Dialog open={open} onOpenChange={onClose}>

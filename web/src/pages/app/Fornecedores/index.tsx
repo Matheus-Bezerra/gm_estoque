@@ -23,7 +23,7 @@ export const Fornecedores = () => {
     const { data: produtosAssociados = [] } = useQuery({
         queryKey: ["associatedProducts"],
         queryFn: async () => {
-            const response = await api.get("/product");
+            const response = await api.get("/product?productsWithoutSupplier=true");
             return response.data;
         },
     });
