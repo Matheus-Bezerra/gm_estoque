@@ -11,6 +11,7 @@ import { EsqueceuSenha } from "./pages/auth/EsqueceuSenha"
 import { SenhaCodigo } from "./pages/auth/SenhaCodigo"
 import { NovaSenha } from "./pages/auth/NovaSenha"
 import { Categorias } from "./pages/app/Categorias"
+import { Configuracoes } from "./pages/app/Configuracoes"
 
 export const router = createBrowserRouter([
     {
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/categorias",
                         element: <Categorias />
+                    },
+                    {
+                        path: "/configuracoes",
+                        element: <Configuracoes />
                     },
                 ]
             }
