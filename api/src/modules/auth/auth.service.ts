@@ -41,9 +41,9 @@ export class AuthService {
 
     const oldPasswordHash = hash('sha256', resetPasswordInput.oldPassword);
     const newPasswordHash = hash('sha256', resetPasswordInput.newPassword);
-    
+
     if (user.password !== oldPasswordHash) {
-      throw new BadRequestException("A senha antiga está incorreta");
+      throw new BadRequestException("A senha atual está incorreta");
     }
 
     if(user.password === newPasswordHash){
