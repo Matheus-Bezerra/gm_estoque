@@ -63,7 +63,7 @@ export function Login() {
 
         toast({
           title: "Erro",
-          description: "Houve algum erro, verifique o login ou tente novamente mais tarde!",
+          description: "Verifique o login ou tente novamente mais tarde!",
           duration: 2000,
           variant: "destructive"
         });

@@ -12,6 +12,7 @@ import { InputPassword } from "@/components/ui/input-password"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AxiosError } from "axios"
 import { Boxes } from "lucide-react"
 import { Helmet } from "react-helmet-async"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
@@ -74,7 +75,8 @@ export function Cadastro() {
 
                 toast({
                     title: "Erro",
-                    description: `${error.message}`,
+                    // @ts-ignore
+                    description: `${(error as AxiosError).response.data.message ? (error as AxiosError).response.data.message : "Houve um erro. Tente novamente mais tarde!"}`,
                     duration: 3000,
                     variant: "destructive"
                 });

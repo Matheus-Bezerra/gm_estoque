@@ -4,6 +4,7 @@ import { InputPassword } from '@/components/ui/input-password';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,12 +43,10 @@ export const FormMudarSenha = () => {
 
     const onSubmit: SubmitHandler<AlterarSenhaFormInputs> = async (data) => {
         try {
-            const response = await api.post("/auth/reset-password", {
-                oldNewPassword: data.currentPassword,
+            await api.post("/auth/reset-password", {
+                oldPassword: data.currentPassword,
                 newPassword: data.newPassword
             });
-
-            console.log("Senha Alterara com Sucesso ", response)
 
             toast({
                 title: "Sucesso",
@@ -56,9 +55,11 @@ export const FormMudarSenha = () => {
                 variant: "success",
             });
         } catch (error) {
+            console.log(error)
             toast({
                 title: "Erro",
-                description: "Não foi possível alterar a senha. Tente novamente.",
+                // @ts-ignore
+                description: `${(error as AxiosError).response.data.message ? (error as AxiosError).response.data.message : "Houve um erro. Tente novamente mais tarde!"}`,
                 duration: 2000,
                 variant: "destructive",
             });
