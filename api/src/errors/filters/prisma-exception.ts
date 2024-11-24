@@ -9,19 +9,25 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    const mapDomain = {
+      'product': 'Produto',
+      'supplier': 'Fornecedor',
+      'category': 'Categoria',
+      'user': 'Usuário'
+    }
     switch(exception.code){
       case 'P2002':
         response.status(HttpStatus.CONFLICT).json({
           statusCode: HttpStatus.CONFLICT,  
-          message: `conflict: ${exception.meta?.target} already exists.`,
+          message: `Conflito: ${exception.meta?.target} já existe.`,
           timestamp: new Date().toISOString(),
           path: request.url
         });
         break;
       case 'P2025':
-        let message = "record not found.";
+        let message = "Registro não encontrado.";
         if(exception.message)
-          message = `${exception.message.split(' ')[1]} not found.`;
+          message = `${mapDomain[exception.message.split(' ')[1].toLowerCase()]} não econtrado.`;
         response.status(HttpStatus.NOT_FOUND).json({
           statusCode: HttpStatus.NOT_FOUND,  
           message: message,
