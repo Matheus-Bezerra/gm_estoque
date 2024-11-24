@@ -12,19 +12,20 @@ export class SupplierService {
 
     async createSupplier(userId: string, supplier: SupplierCreateInput): Promise<Supplier> {
 
-        let supplierCreated: Prisma.SupplierCreateArgs = {
-            data: {
-                name: supplier.name,
-                email: supplier.email,
-                user: { connect: { id: userId } }
-            }, include: { products: true }
+        let data: Prisma.SupplierCreateInput = {
+            name: supplier.name,
+            email: supplier.email,
+            user: { connect: { id: userId } }
         }
 
         if (supplier.productsIds && supplier.productsIds.length > 0)
-            supplierCreated.data.products = { connect: supplier.productsIds.map(id => ({ id })) };
+            data.products = { connect: supplier.productsIds.map(id => ({ id })) };
 
 
-        return await this.prisma.supplier.create(supplierCreated);
+        return await this.prisma.supplier.create({
+            data,
+            include: { products: true }
+        });
     }
 
     async getAllSuppliers(userId: string): Promise<Supplier[]> {
@@ -60,7 +61,11 @@ export class SupplierService {
                 }
             });
             const productsAssociateSuppliers = supplier.productsIds.filter(id => !supplierItem.products.map(product => product.id).includes(id));
-            data.products = { disconnect: productsDisassociateSuppliers.map(id => id), connect: productsAssociateSuppliers.map(id => ({ id })) };
+            data.products = {};
+            if (productsDisassociateSuppliers && productsDisassociateSuppliers.length > 0)
+                data.products.disconnect = productsDisassociateSuppliers;
+            if (productsAssociateSuppliers && productsAssociateSuppliers.length > 0)
+                data.products.connect = productsAssociateSuppliers.map(id => ({ id }));
         }
 
         return await this.prisma.supplier.update({
@@ -72,7 +77,8 @@ export class SupplierService {
 
     async deleteSupplier(id: string): Promise<Supplier> {
         return await this.prisma.supplier.delete({
-            where: { id }
+            where: { id },
+            include: { products: true }
         });
     }
 }

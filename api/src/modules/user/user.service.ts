@@ -32,7 +32,7 @@ export class UserService {
 
     async deleteUser(id: string): Promise<User> {
         return await this.prisma.user.delete({
-            where: { id }
+            where: { id }, include: { products: true, categories: true }
         });
     }
 }

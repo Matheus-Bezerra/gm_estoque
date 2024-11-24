@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, BadRequestException, Query } from '@nestjs/common';
 import { Prisma, TypeControl } from '@prisma/client';
 import { ProductService } from './product.service';
 import { ProductCreateInput, ProductGetAllInput } from './domain/products.interface';
@@ -8,19 +8,19 @@ export class ProductController {
     constructor(private readonly productService: ProductService) { }
 
     @Get()
-    async getAllProducts(@Request() req, @Body() input?: ProductGetAllInput) {
+    async getAllProducts(@Request() req, @Query() input?: ProductGetAllInput) {
         return await this.productService.getAllProducts(req.user.id, input);
     }
 
     @Post()
     async createProduct(@Request() req, @Body() product: ProductCreateInput) {
-        this.validateProduct(product);
+        await this.productService.validateProduct(product);
         return await this.productService.createProduct(req.user.id, product);
     }
 
     @Put(':id')
     async updateProduct(@Param('id') id: string, @Body() updateProduct: Prisma.ProductUpdateInput) {
-        this.validateProduct(updateProduct);
+        await this.productService.validateProduct(updateProduct);
         return await this.productService.updateProduct(id, updateProduct);
     }
 
@@ -29,12 +29,4 @@ export class ProductController {
         return await this.productService.deleteProduct(id);
     }
 
-    private validateProduct(product: Prisma.ProductCreateInput | Prisma.ProductUpdateInput) {
-        if (product.typeControl === TypeControl.UNIT && (product.quantity == null || product.quantity as number < 0)) {
-            throw new BadRequestException('Quantity is required when typeControl is UNIT');
-        }
-        if (product.typeControl === TypeControl.WEIGHT && (product.amount == null || product.amount as number < 0)) {
-            throw new BadRequestException('Amount is required when typeControl is WEIGHT');
-        }
-    }
 }

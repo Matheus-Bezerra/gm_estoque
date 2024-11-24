@@ -36,6 +36,13 @@ export class CategoryService {
         );
     }
 
+    async getCategoryById(id: string): Promise<Category> {
+        return await this.prisma.category.findUnique({
+            where: { id },
+            include: { products: true }
+        });
+    }
+
     async updateCategory(id: string, category: CategoryUpdateInput): Promise<Category> {
 
         let data: Prisma.CategoryUpdateInput = {}
@@ -46,15 +53,19 @@ export class CategoryService {
         if (category.productsIds) {
             const productsDisassociateCategories = [];
             const categoryItem = await this.prisma.category.findUnique({ where: { id }, include: { products: true } });
+            
             categoryItem.products.forEach(product => {
                 if (!category.productsIds.includes(product.id)) {
                     productsDisassociateCategories.push({ id: product.id });
                 }
             });
             const productsAssociateCategories = category.productsIds.filter(id => !categoryItem.products.map(product => product.id).includes(id));
-
-            data.products = { disconnect: productsDisassociateCategories.map(id => id), connect: productsAssociateCategories.map(id => ({ id })) };
-        }
+            data.products = {};
+            if (productsDisassociateCategories && productsDisassociateCategories.length > 0)
+                data.products.disconnect = productsDisassociateCategories;
+            if (productsAssociateCategories && productsAssociateCategories.length > 0)
+                data.products.connect = productsAssociateCategories.map(id => ({ id }));
+        };
 
         return await this.prisma.category.update({
             where: { id },

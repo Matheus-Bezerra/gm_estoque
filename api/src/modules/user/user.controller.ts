@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Request,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { UserService } from './user.service';
@@ -21,16 +22,16 @@ export class UserController {
     return this.userService.createUser(user);
   }
 
-  @Put(':id')
+  @Put()
   updateUser(
-    @Param('id') id: string,
+    @Request() req,
     @Body() updateUser: Prisma.UserUpdateInput,
   ) {
-    return this.userService.updateUser(id, updateUser);
+    return this.userService.updateUser(req.user.id, updateUser);
   }
 
-  @Delete(':id')
-  deleteUser(@Param('id') id: string) {
-    return this.userService.deleteUser(id);
+  @Delete()
+  deleteUser(@Request() req) {
+    return this.userService.deleteUser(req.user.id);
   }
 }

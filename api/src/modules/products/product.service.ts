@@ -2,12 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Product, Prisma, TypeControl, Category } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductCreateInput, ProductGetAllInput, ProductUpdateInput } from './domain/products.interface';
+import { SupplierService } from '../suppliers/supplier.service';
+import { CategoryService } from '../categories/category.service';
 
 @Injectable()
 export class ProductService {
 
 
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private supplierService: SupplierService, private categoryService: CategoryService) { }
 
 
     async createProduct(userId: string, product: ProductCreateInput): Promise<Product> {
@@ -52,7 +54,14 @@ export class ProductService {
         return await this.prisma.product.findMany(args);
     }
 
-    async updateProduct(id: string, product: ProductUpdateInput): Promise<Product> {
+    async getProductById(id: string): Promise<Product> {
+        return await this.prisma.product.findUnique({
+            where: { id },
+            include: { supplier: true, category: true }
+        });
+    }
+
+    async updateProduct(id: string, productUpdate: ProductUpdateInput): Promise<Product> {
         
         let data: Prisma.ProductUpdateInput = {};
 
@@ -62,32 +71,32 @@ export class ProductService {
             }
         };
 
-        updateField('name', product.name);
-        updateField('typeControl', product.typeControl);
-        updateField('quantity', product.quantity);
-        updateField('amount', product.amount);
+        updateField('name', productUpdate.name);
+        updateField('typeControl', productUpdate.typeControl);
+        updateField('quantity', productUpdate.quantity);
+        updateField('amount', productUpdate.amount);
 
-        if (product.typeControl || product.supplierId || product.categoryId) {
+        if (productUpdate.typeControl || productUpdate.supplierId || productUpdate.categoryId) {
 
-            const productItem = await this.prisma.product.findUnique({ where: { id } });
+            const product = await this.prisma.product.findUnique({ where: { id }, include: { supplier: true, category: true } });
 
-            if(product.typeControl !== productItem.typeControl)
-                if (product.typeControl === TypeControl.UNIT) {
+            if(productUpdate?.typeControl !== product.typeControl)
+                if (productUpdate.typeControl === TypeControl.UNIT) {
                     data.amount = null;
-                } else if (product.typeControl === TypeControl.WEIGHT) {
+                } else if (productUpdate.typeControl === TypeControl.WEIGHT) {
                     data.quantity = null;
                 }
-
-            if (product?.supplierId) {
-                data.supplier = { disconnect: { id: productItem.supplierId },connect: { id: product.supplierId } };
+            
+            if (productUpdate?.supplierId && (!product.supplier || product.supplierId !== productUpdate.supplierId)) {
+                data.supplier = { connect: { id: productUpdate.supplierId } };
             }
 
-            if (product?.categoryId) {
-                data.category = { disconnect: { id: productItem.categoryId }, connect: { id: product.categoryId } };
+            if (productUpdate?.categoryId && (!product.category || product.categoryId !== productUpdate.categoryId)) {
+               data.category = { connect: { id: productUpdate.categoryId } };
             }
     
         }
-
+        
         return await this.prisma.product.update({
             where: { id },
             data,
@@ -101,13 +110,35 @@ export class ProductService {
         });
     }
 
-    async validateProduct(product: Prisma.ProductCreateInput | Prisma.ProductUpdateInput) {
+    async validateProduct(product: ProductCreateInput | ProductUpdateInput, productId?: string) {
 
-        if (product.typeControl == TypeControl.UNIT && (product.quantity == null || product.quantity as number < 0)) {
-            throw new BadRequestException('Quantity is required when typeControl is UNIT');
+        if(productId){
+            const product = await this.getProductById(productId);
+            if(!product) {
+                throw new BadRequestException('Produto não encontrado');
+            }
         }
-        if (product.typeControl == TypeControl.WEIGHT && (product.amount == null || product.amount as number < 0)) {
-            throw new BadRequestException('Amount is required when typeControl is WEIGHT');
+
+        if (product?.typeControl == TypeControl.UNIT && (product.quantity == null || product.quantity as number < 0)) {
+            throw new BadRequestException('Quantidade é obrigatória quando o tipo de controle é UNIDADE');
+        }
+       
+        if (product?.typeControl == TypeControl.WEIGHT && (product.amount == null || product.amount as number < 0)) {
+            throw new BadRequestException('Peso é obrigatório quando o tipo de controle é PESO');
+        }
+
+        if(product?.supplierId) {
+            const supplier = await this.supplierService.getSupplierById(product.supplierId);
+            if(!supplier) {
+                throw new BadRequestException('Fornecedor não encontrado');
+            }
+        }
+
+        if(product?.categoryId) {
+            const category = await this.categoryService.getCategoryById(product.categoryId);
+            if(!category) {
+                throw new BadRequestException('Categoria não encontrada');
+            }
         }
 
     }

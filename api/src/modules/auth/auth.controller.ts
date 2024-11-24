@@ -3,7 +3,7 @@ import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards, Get, Request }
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './public.decorator';
-import { signInInput } from './domain/login.interface';
+import { resetPasswordInput, signInInput } from './domain/auth.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -16,9 +16,14 @@ export class AuthController {
     return this.authService.signIn(signInInput);
   }
 
-  @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @Post("reset-password")
+  resetPassword(@Request() req, @Body() resetPasswordInput: resetPasswordInput ) {
+    return this.authService.resetPassword(req.user.id, resetPasswordInput);
+  }
+
 }
