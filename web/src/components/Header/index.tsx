@@ -54,13 +54,13 @@ export const Header = () => {
                             <Tag className="h-5 w-5" />
                             Categorias
                         </Link>
-                        <Link
+                        {/* <Link
                             to="analise"
                             className={`flex items-center gap-4 px-2.5 ${location.pathname === '/analise' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <LineChart className="h-5 w-5" />
                             Análise
-                        </Link>
+                        </Link> */}
                     </nav>
                 </SheetContent>
             </Sheet>

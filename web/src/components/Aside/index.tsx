@@ -65,7 +65,7 @@ export const Aside = () => {
         </TooltipTrigger>
         <TooltipContent side="right">Categorias</TooltipContent>
       </Tooltip>
-      <Tooltip>
+      {/* <Tooltip>
         <TooltipTrigger asChild>
           <Link
             to="analise"
@@ -76,7 +76,7 @@ export const Aside = () => {
           </Link>
         </TooltipTrigger>
         <TooltipContent side="right">Análise</TooltipContent>
-      </Tooltip>
+      </Tooltip> */}
     </nav>
     <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
       <Tooltip>
