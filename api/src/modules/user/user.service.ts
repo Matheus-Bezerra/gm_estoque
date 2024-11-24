@@ -10,9 +10,15 @@ export class UserService {
     constructor(private prisma: PrismaService) { }
 
 
-    async findOne(username: string): Promise<User | undefined> {
+    async findByUsername(username: string): Promise<User | undefined> {
         return await this.prisma.user.findUnique({
             where: { name: username }
+        })
+    }
+
+    async findById(id: string): Promise<User | undefined> {
+        return await this.prisma.user.findUnique({
+            where: { id: id }
         })
     }
 

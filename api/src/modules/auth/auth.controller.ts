@@ -23,6 +23,8 @@ export class AuthController {
 
   @Post("reset-password")
   resetPassword(@Request() req, @Body() resetPasswordInput: resetPasswordInput ) {
+    console.log("req.user");
+    console.log(req.user);
     return this.authService.resetPassword(req.user.id, resetPasswordInput);
   }
 

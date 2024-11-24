@@ -15,10 +15,10 @@ export class AuthService {
   async signIn(
     signInInput: signInInput
   ): Promise<{ access_token: string }> {
-    const user = await this.userService.findOne(signInInput.username);
+    const user = await this.userService.findByUsername(signInInput.username);
 
     if (!user) {
-      throw new NotFoundException("User not found exception");
+      throw new NotFoundException("Usuário não encontrado");
     }
 
     const passHash = hash('sha256', signInInput.password); 
@@ -33,15 +33,15 @@ export class AuthService {
   }
 
   async resetPassword(userId: string, resetPasswordInput: resetPasswordInput) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.findById(userId);
 
     if (!user) {
-      throw new NotFoundException("User not found exception");
+      throw new NotFoundException("Usuário não encontrado");
     }
 
     const passHash = hash('sha256', resetPasswordInput.oldPassword); 
     if (user.password !== passHash) {
-      throw new BadRequestException("As senhas não conferem");
+      throw new BadRequestException("A senha antiga está incorreta");
     }
 
     return await this.userService.updateUser(userId, { password: resetPasswordInput.newPassword});
