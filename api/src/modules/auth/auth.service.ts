@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService
-  ) {}
+  ) { }
 
   async signIn(
     signInInput: signInInput
@@ -21,12 +21,12 @@ export class AuthService {
       throw new NotFoundException("Usuário não encontrado");
     }
 
-    const passHash = hash('sha256', signInInput.password); 
+    const passHash = hash('sha256', signInInput.password);
     if (user.password !== passHash) {
       throw new UnauthorizedException();
     }
     const payload = { id: user.id, username: user.name, email: user.email };
-     
+
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -39,11 +39,11 @@ export class AuthService {
       throw new NotFoundException("Usuário não encontrado");
     }
 
-    const passHash = hash('sha256', resetPasswordInput.oldPassword); 
+    const passHash = hash('sha256', resetPasswordInput.oldPassword);
     if (user.password !== passHash) {
       throw new BadRequestException("A senha antiga está incorreta");
     }
 
-    return await this.userService.updateUser(userId, { password: resetPasswordInput.newPassword});
+    return await this.userService.updateUser(userId, { password: passHash });
   }
 }
