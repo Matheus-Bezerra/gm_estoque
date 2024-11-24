@@ -13,7 +13,7 @@ export class ProductService {
 
 
     async createProduct(userId: string, product: ProductCreateInput): Promise<Product> {
-           
+
         let productCreate: Prisma.ProductCreateArgs = {
             data: {
                 name: product.name,
@@ -24,11 +24,11 @@ export class ProductService {
             }, include: { supplier: true, category: true }
         }
 
-        if(product.supplierId) {
+        if (product.supplierId) {
             productCreate.data.supplier = { connect: { id: product.supplierId } }
         }
 
-        if(product.categoryId) {
+        if (product.categoryId) {
             productCreate.data.category = { connect: { id: product.categoryId } }
         }
 
@@ -43,12 +43,22 @@ export class ProductService {
             orderBy: { updateAt: 'desc' }
         }
 
-        if(input?.productsWithoutSupplier) {
-            args.where = { ...args.where, supplierId: null }
+        args.where.OR = [];
+        
+        if (input?.productsWithoutSupplier) {
+            args.where.OR.push({ supplierId: null })
         }
 
-        if(input?.productsWithoutCategory) {
-            args.where = { ...args.where, categoryId: null }
+        if (input?.productsWithoutCategory) {
+            args.where.OR.push({ categoryId: null })
+        }
+
+        if (input?.supplierId) {
+            args.where.OR.push({ supplierId: input.supplierId })
+        }
+
+        if (input?.categoryId) {
+            args.where.OR.push({ categoryId: input.categoryId })
         }
 
         return await this.prisma.product.findMany(args);
@@ -62,7 +72,7 @@ export class ProductService {
     }
 
     async updateProduct(id: string, productUpdate: ProductUpdateInput): Promise<Product> {
-        
+
         let data: Prisma.ProductUpdateInput = {};
 
         const updateField = (field: keyof ProductUpdateInput, value: any) => {
@@ -80,23 +90,23 @@ export class ProductService {
 
             const product = await this.prisma.product.findUnique({ where: { id }, include: { supplier: true, category: true } });
 
-            if(productUpdate?.typeControl !== product.typeControl)
+            if (productUpdate?.typeControl !== product.typeControl)
                 if (productUpdate.typeControl === TypeControl.UNIT) {
                     data.amount = null;
                 } else if (productUpdate.typeControl === TypeControl.WEIGHT) {
                     data.quantity = null;
                 }
-            
+
             if (productUpdate?.supplierId && (!product.supplier || product.supplierId !== productUpdate.supplierId)) {
                 data.supplier = { connect: { id: productUpdate.supplierId } };
             }
 
             if (productUpdate?.categoryId && (!product.category || product.categoryId !== productUpdate.categoryId)) {
-               data.category = { connect: { id: productUpdate.categoryId } };
+                data.category = { connect: { id: productUpdate.categoryId } };
             }
-    
+
         }
-        
+
         return await this.prisma.product.update({
             where: { id },
             data,
@@ -112,9 +122,9 @@ export class ProductService {
 
     async validateProduct(product: ProductCreateInput | ProductUpdateInput, productId?: string) {
 
-        if(productId){
+        if (productId) {
             const product = await this.getProductById(productId);
-            if(!product) {
+            if (!product) {
                 throw new BadRequestException('Produto não encontrado');
             }
         }
@@ -122,21 +132,21 @@ export class ProductService {
         if (product?.typeControl == TypeControl.UNIT && (product.quantity == null || product.quantity as number < 0)) {
             throw new BadRequestException('Quantidade é obrigatória quando o tipo de controle é UNIDADE');
         }
-       
+
         if (product?.typeControl == TypeControl.WEIGHT && (product.amount == null || product.amount as number < 0)) {
             throw new BadRequestException('Peso é obrigatório quando o tipo de controle é PESO');
         }
 
-        if(product?.supplierId) {
+        if (product?.supplierId) {
             const supplier = await this.supplierService.getSupplierById(product.supplierId);
-            if(!supplier) {
+            if (!supplier) {
                 throw new BadRequestException('Fornecedor não encontrado');
             }
         }
 
-        if(product?.categoryId) {
+        if (product?.categoryId) {
             const category = await this.categoryService.getCategoryById(product.categoryId);
-            if(!category) {
+            if (!category) {
                 throw new BadRequestException('Categoria não encontrada');
             }
         }
