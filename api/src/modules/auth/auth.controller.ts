@@ -3,6 +3,7 @@ import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards, Get, Request }
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './public.decorator';
+import { signInInput } from './domain/login.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -11,8 +12,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+  signIn(@Body() signInInput: signInInput) {
+    return this.authService.signIn(signInInput);
   }
 
   @UseGuards(AuthGuard)

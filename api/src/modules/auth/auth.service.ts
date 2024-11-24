@@ -1,8 +1,9 @@
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { hash } from 'crypto';
+import { Sign, hash } from 'crypto';
+import { signInInput } from './domain/login.interface';
 
 @Injectable()
 export class AuthService {
@@ -12,11 +13,15 @@ export class AuthService {
   ) {}
 
   async signIn(
-    username: string,
-    pass: string,
+    signInInput: signInInput
   ): Promise<{ access_token: string }> {
-    const user = await this.userService.findOne(username);
-    const passHash = hash('sha256', pass);
+    const user = await this.userService.findOne(signInInput.username);
+    
+    if (!user) {
+      throw new NotFoundException("User not found exception");
+    }
+
+    const passHash = hash('sha256', signInInput.password); 
     if (user.password !== passHash) {
       throw new UnauthorizedException();
     }
