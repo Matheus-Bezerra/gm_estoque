@@ -1,4 +1,4 @@
-import { Boxes, Home, Users2, Tag, LineChart, Settings, PackageOpen } from "lucide-react"
+import { Boxes, Home, Users2, Tag, Settings, PackageOpen } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 

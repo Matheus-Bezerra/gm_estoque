@@ -1,4 +1,4 @@
-import { Boxes, Home, LineChart, PackageOpen, PanelLeft, Tag, Users2 } from "lucide-react"
+import { Boxes, Home, PackageOpen, PanelLeft, Tag, Users2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Link, useLocation } from "react-router-dom"
