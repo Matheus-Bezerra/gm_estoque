@@ -18,6 +18,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/db_postgres?schema=public
+      ENV: development
     ports:
       - "3001:3001"
     volumes:
