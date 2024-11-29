@@ -43,9 +43,9 @@ export function DialogEditProduto({
         },
     });
 
-    const [tipoControle, setTipoControle] = useState<"UNIT" | "WEITGHT">(produto.typeControl);
+    const [tipoControle, setTipoControle] = useState<"UNIT" | "WEIGHT">(produto.typeControl);
 
-    const handleTipoControleChange = (value: "UNIT" | "WEITGHT") => {
+    const handleTipoControleChange = (value: "UNIT" | "WEIGHT") => {
         setTipoControle(value);
         setValue("quantity", undefined);
         setValue("amount", undefined);
@@ -102,7 +102,7 @@ export function DialogEditProduto({
                         name="typeControl"
                         control={control}
                         render={({ field }) => (
-                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEITGHT") => {
+                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEIGHT") => {
                                 field.onChange(value);
                                 handleTipoControleChange(value);
                             }}>
@@ -111,22 +111,22 @@ export function DialogEditProduto({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="UNIT">Controle: Quantidade</SelectItem>
-                                    <SelectItem value="WEITGHT">Controle: Peso</SelectItem>
+                                    <SelectItem value="WEIGHT">Controle: Peso</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
                     />
                     {/* Renderização Condicional com Controller para Peso ou Quantidade */}
                     <Controller
-                        name={tipoControle === "WEITGHT" ? "amount" : "quantity"}
+                        name={tipoControle === "WEIGHT" ? "amount" : "quantity"}
                         control={control}
                         rules={{
-                            required: tipoControle === "WEITGHT"
+                            required: tipoControle === "WEIGHT"
                                 ? "Peso é obrigatório."
                                 : "Quantidade é obrigatória."
                         }}
                         render={({ field, field: { value } }) => (
-                            tipoControle === "WEITGHT" ? (
+                            tipoControle === "WEIGHT" ? (
                                 <div>
                                     <Input
                                         {...field}
