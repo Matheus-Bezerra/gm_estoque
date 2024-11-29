@@ -20,6 +20,7 @@ export class ProductService {
                 typeControl: product.typeControl,
                 quantity: product.quantity,
                 amount: product.amount,
+                status: product.status,
                 user: { connect: { id: userId } }
             }, include: { supplier: true, category: true }
         }
@@ -90,6 +91,7 @@ export class ProductService {
         updateField('typeControl', productUpdate.typeControl);
         updateField('quantity', productUpdate.quantity);
         updateField('amount', productUpdate.amount);
+        updateField('status', productUpdate.status);
 
         if (productUpdate.typeControl || productUpdate.supplierId || productUpdate.categoryId) {
 
