@@ -42,15 +42,20 @@ export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtos
         try {
             onSubmit(data);
             reset(valoresPadraoAdicionarCategoria)
-        } catch (err) {}
+        } catch (err) { }
     };
 
     const produtosSelect = produtosLista.map(pa => {
-        return {label: pa.name, value: pa.id}
+        return { label: pa.name, value: pa.id }
     })
 
     return (
-        <Dialog open={isDialogAddCategoriaOpen} onOpenChange={setDialogAddCategoriaOpen}>
+        <Dialog open={isDialogAddCategoriaOpen} onOpenChange={(isOpen) => {
+            setDialogAddCategoriaOpen(isOpen)
+            if (!isOpen) {
+                reset(valoresPadraoAdicionarCategoria)
+            }
+        }}>
             <DialogTrigger asChild>
                 <Button>+ Adicionar Categoria</Button>
             </DialogTrigger>
@@ -80,7 +85,7 @@ export const DialogAddCategoria: React.FC<DialogAddCategoriaProps> = ({ produtos
                             render={({ field }) => (
                                 <>
                                     <div className="flex items-center gap-2">
-                                        <Brush 
+                                        <Brush
                                             onClick={handleBrushClick}
                                             className="cursor-pointer"
                                         />

@@ -39,7 +39,12 @@ export const DialogAddFornecedor: React.FC<DialogAddFornecedorProps> = ({ produt
     })
 
     return (
-        <Dialog open={isDialogAddFornecedorOpen} onOpenChange={setDialogAddFornecedorOpen}>
+        <Dialog open={isDialogAddFornecedorOpen} onOpenChange={(isOpen) => {
+            setDialogAddFornecedorOpen(isOpen)
+            if(!isOpen) {
+                reset(valoresPadraoAdicionarFornecedor)
+            }
+        } }>
             <DialogTrigger asChild>
                 <Button>+ Adicionar Fornecedor</Button>
             </DialogTrigger>

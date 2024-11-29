@@ -30,9 +30,9 @@ export const FormMudarSenha = () => {
 
     type AlterarSenhaFormInputs = z.infer<typeof alterarSenhaSchema>;
     const { toast } = useToast()
-    
 
-    const { handleSubmit, control, formState: { errors } } = useForm<AlterarSenhaFormInputs>({
+
+    const { handleSubmit, control, reset, formState: { errors } } = useForm<AlterarSenhaFormInputs>({
         resolver: zodResolver(alterarSenhaSchema),
         defaultValues: {
             currentPassword: "",
@@ -46,6 +46,12 @@ export const FormMudarSenha = () => {
             await api.post("/auth/reset-password", {
                 oldPassword: data.currentPassword,
                 newPassword: data.newPassword
+            });
+
+            reset({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
             });
 
             toast({
