@@ -51,7 +51,7 @@ export interface FornecedorAPI {
 export interface ProdutoApi {
     id: string
     name: string
-    typeControl: "UNIT" |  "WEITGHT"
+    typeControl: "UNIT" |  "WEIGHT"
     quantity?: number 
     amount?: number
     status: "ACTIVE" | "INACTIVE"
