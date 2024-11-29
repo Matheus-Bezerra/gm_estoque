@@ -106,7 +106,7 @@ export const Home = () => {
                                 </TableHeader>
                                 <TableBody>
                                     {produtos.length > 0 && produtos.slice(0, 5).map(produto => (
-                                        <TableRow>
+                                        <TableRow key={produto.id}>
                                             <TableCell>
                                                 <div className="font-medium">{produto.name}</div>
                                                 <div className="flex items-center gap-2 mt-1">
@@ -139,7 +139,7 @@ export const Home = () => {
                         <CardContent className="grid gap-8">
                             {
                                 fornecedores.length > 0 && fornecedores.slice(0, 5).map(fornecedor => (
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4" key={fornecedor.id}>
                                         <Avatar className="hidden h-9 w-9 sm:flex">
                                             <AvatarImage src="/avatars/01.png" alt="Avatar" />
                                             <AvatarFallback>

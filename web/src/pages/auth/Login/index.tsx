@@ -103,9 +103,9 @@ export function Login() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Senha</Label>
-                <Link to="/auth/esqueceu-senha" className="ml-auto inline-block text-sm underline">
+                {/* <Link to="/auth/esqueceu-senha" className="ml-auto inline-block text-sm underline">
                   Esqueceu sua senha?
-                </Link>
+                </Link> */}
               </div>
               <Controller
                 name="password"

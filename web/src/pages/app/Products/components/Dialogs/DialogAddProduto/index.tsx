@@ -40,11 +40,17 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
         try {
             onSubmit(data);
             reset(valoresPadraoAdicionarProduto)
-        } catch (err) {}
+        } catch (err) { }
     };
 
     return (
-        <Dialog open={isDialogAddProdutoOpen} onOpenChange={setDialogAddProdutoOpen}>
+        <Dialog open={isDialogAddProdutoOpen} onOpenChange={(isOpen) => {
+            setDialogAddProdutoOpen(isOpen);
+            if (!isOpen) {
+                setAddTipoControle("quantidade")
+                reset(valoresPadraoAdicionarProduto); // Reseta os valores ao fechar a modal
+            }
+        }}>
             <DialogTrigger asChild>
                 <Button>+ Adicionar Produto</Button>
             </DialogTrigger>
