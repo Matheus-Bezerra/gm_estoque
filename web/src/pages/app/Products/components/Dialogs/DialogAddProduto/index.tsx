@@ -91,7 +91,7 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                         name="typeControl"
                         control={control}
                         render={({ field }) => (
-                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEITGHT") => {
+                            <Select value={field.value} onValueChange={(value: "UNIT" | "WEIGHT") => {
                                 field.onChange(value);
                                 setAddTipoControle(value);
                             }}>
@@ -100,13 +100,13 @@ export const DialogAddProduto: React.FC<DialogAddProdutoProps> = ({ fornecedores
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="UNIT">Controle: Quantidade</SelectItem>
-                                    <SelectItem value="WEITGHT">Controle: Peso</SelectItem>
+                                    <SelectItem value="WEIGHT">Controle: Peso</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}
                     />
 
-                    {addTipoControle === "WEITGHT" ? (
+                    {addTipoControle === "WEIGHT" ? (
                         <div>
                             <Controller
                                 name="amount"

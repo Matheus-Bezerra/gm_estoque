@@ -15,7 +15,7 @@ export const useEditProductMutation = (setOpenEdit: (value: boolean) => void) =>
                 if (data.quantity && typeof data.quantity === "string") {
                     data.quantity = parseInt(data.quantity, 10);
                 }
-            } else if (data.typeControl === "WEITGHT") {
+            } else if (data.typeControl === "WEIGHT") {
                 delete data.quantity;
                 if (typeof data.amount === "string") {
                     data.amount = parseFloat(data.amount.replace(",", "."));
