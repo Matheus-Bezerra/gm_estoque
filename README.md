@@ -12,16 +12,15 @@ npm run dev
 
 Back End:
 cd api
-
-npm run start
+docker compose up
 ```
-
-<img src="videos/gm_estoque.gif" alt="Demonstração do sistema" />
 
 Abrir [http://localhost:5173](http://localhost:5173) para visualizar o front end. <br />
 Abrir [http://localhost:3001](http://localhost:3001) para consumir o back end.
 
 <hr><br>
+
+<img src="videos/gm_estoque.gif" alt="Demonstração do sistema" />
 
 ## Tecnologias
 
