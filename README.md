@@ -2,7 +2,7 @@
 
 Uma aplicação projetada para otimizar o controle de produtos armazenados, permitindo que os usuários rastreiem, organizem e administrem seus estoques de maneira eficiente e precisa podendo associar a um fornecedor e categoria.
 
-Para rodar o projeto: (Observação: Back end precisa ter o Docker instalado na sua maquina)
+### Para rodar o projeto: (Observação: Back end precisa ter o Docker instalado na sua máquina)
 
 ```bash
 Front End:
@@ -16,7 +16,9 @@ cd api
 npm run start
 ```
 
-Abrir [http://localhost:5173](http://localhost:5173) para visualizar o front end.
+<img src="videos/gm_estoque.gif" alt="Demonstração do sistema" />
+
+Abrir [http://localhost:5173](http://localhost:5173) para visualizar o front end. <br />
 Abrir [http://localhost:3001](http://localhost:3001) para consumir o back end.
 
 <hr><br>
@@ -35,7 +37,7 @@ O projeo foi desenvovido com as seguintes tecnologias:
 - React Router DOM
 - Radix UI
 
-### Front End:
+### Back End:
 - Typescript
 - Nestjs
 - Prisma
