@@ -11,8 +11,7 @@ npm i
 npm run dev
 
 Back End:
-cd api
-docker compose up
+docker compose up -d --build
 ```
 
 Abrir [http://localhost:5173](http://localhost:5173) para visualizar o front end. <br />
