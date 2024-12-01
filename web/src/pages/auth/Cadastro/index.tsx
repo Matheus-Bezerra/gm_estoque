@@ -51,7 +51,7 @@ export function Cadastro() {
 
     const navigate = useNavigate();
 
-    const onSubmit: SubmitHandler<CadastroFormInputs> = (data) => {
+    const onSubmit: SubmitHandler<CadastroFormInputs> = async (data) => {
         console.log("Dados do Cadastro ", data)
 
         const user = {
@@ -59,7 +59,7 @@ export function Cadastro() {
             email: data.email,
             password: data.confirmPassword
         }
-        api.post("/user", user)
+        await api.post("/user", user)
             .then(() => {
                 toast({
                     title: "Sucesso",

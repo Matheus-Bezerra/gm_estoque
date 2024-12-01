@@ -2,11 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /api
 
-COPY package.json ./
-COPY package-lock.json ./
-COPY tsconfig.json ./
-COPY prisma ./prisma
-COPY dist ./dist
+COPY . .
 
 RUN npm install
 
@@ -19,5 +15,6 @@ CMD sh -c "if [ \"$ENV\" = 'development' ]; then \
     else \
     npx prisma migrate deploy --schema=/api/prisma/schema.prisma && \
     npx prisma generate --schema=/api/prisma/schema.prisma && \
+    npm run build && \
     npm run start:prod; \
     fi"
