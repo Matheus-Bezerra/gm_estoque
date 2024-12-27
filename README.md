@@ -1,7 +1,7 @@
 ## GM Estoque
 
 Uma aplicação projetada para otimizar o controle de produtos armazenados, permitindo que os usuários rastreiem, organizem e administrem seus estoques de maneira eficiente e precisa podendo associar a um fornecedor e categoria.
-<br /> Link da Produção: https://gmestoque.vercel.app/auth
+<br /> Link da Produção: [https://gmestoque.vercel.app/auth](https://gmestoque.vercel.app/)
 
 ### Para rodar o projeto: (Observação: Back end precisa ter o Docker instalado na sua máquina)
 
